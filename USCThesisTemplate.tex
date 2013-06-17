@@ -1,0 +1,78 @@
+\documentclass{USC-Thesis}
+% This template is take from my PhD thesis. I use the USC style file which was passed to me from USC alumni.
+% You need to install the package TOCLOFT to change the font of the chapters in the TOC from bold to normal.
+% Stefano Campagnola
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{epsfig}
+\usepackage[titles]{tocloft}
+% change section headers and page numbers to normal instead of bold font
+\renewcommand{\cftchapfont}{
+\normalfont
+}
+\renewcommand{\cftchappagefont}{%
+\normalfont
+}
+
+
+\begin{document}
+
+\title{Your title here \break (in two lines if necessary)}
+
+\author{John Smith}
+\major{Aerospace Engineering}
+\month{May}
+\year{2010}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+\maketitle
+
+\dedication
+    \begin{quote}
+        \raggedleft {\em To x,y}\\
+        \raggedleft {\em and especially to z.}
+    \end{quote}
+
+
+\topmatter{Acknowledgments}
+Your Acknowledgments
+
+
+% Table Of Contents
+\tableofcontents
+
+% List of tables
+\listoftables
+
+% List of figures
+\listoffigures
+
+\topmatter{Abstract}
+Your Abstract.
+
+%\topmatter{Preface}
+% Your Preface(optional).
+
+% Begin Body
+\mainmatter
+Your thesis.
+
+\bibliographystyle{alpha}
+%\bibliography{bibliography} % Add here your bibliography file
+
+%\input{appendix2.2.tex}
+\topmatter{Appendix A}
+\appendix
+%\input{appendixA.tex}
+
+\topmatter{Appendix B}
+\appendix
+%\input{appendixB.tex}
+
+\end{document}

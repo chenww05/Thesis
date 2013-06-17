@@ -1,0 +1,102 @@
+\chapter{Planned Work}
+
+The tradeoff between resource cost and runtime performance has been given a lot of attention in the past few years. However, how task clustering influences the resource cost and runtime performance respectively has not been discussed throughly. In this chapter, we propose to develop resource-aware clustering methods that adjust the strength of task clustering (size of a clustered job, i.e.) in order to improve both the resource cost and overall runtime of executing scientific workflows on clouds. 
+
+\section{Motivation}
+
+The resource requirement of large scale scientific workflows has been increasing with the scale of computation and data transfer. 
+%There are two distributed computing paradigms widely used to provide a wide access to computing resources. The development of grid computing \cite{Foster1997} has enabled virtual organizations to securely share the computational infrastructure of their member institutions. More 
+Recently, the development of cloud computing \cite{Hoffa2008, AmazonAWS} has made it possible for anyone to easily lease large scale computing infrastructure from commercial resource providers. However, the resource usage of clouds is associated with monetary cost and the studies in reducing resource cost have been concluded ever since the emergence of cloud computing. Juve \cite{Juve2008} et al. has utilized clouds to execute large scale scientific workflows and provided a series of provisioning and scheduling algorithms to improve the runtime and resource cost together. At the same time, there are still scheduling overheads for workflows running on a cloud and task clustering still applies in that case. 
+%Need more challenge
+The challenge is, on one hand, the amount of resources provisioned should not exceed the maximum parallelism degree of a workflow, otherwise resources are wasted and resource cost is increased without any performance gain. On the other hand, the amount of resources should be large enough so that the runtime performance of workflows is not influenced by the lack of resources. What makes this problem even more challenging is that these two goals (performance vs cost) are usually conflicting and it is a typical multi-objective optimization problem \cite{Talukder2009, Wieczorek2009}. 
+%what is the real challenge
+
+In our work, we specifically focus on balancing the resource cost and runtime performance through task clustering, which we call resource aware clustering. We plan to model the relationship between overall runtime and the resources used (and thus the associated resource cost). The approach we plan to use is to adjust the strength of task clustering (for example, size of a clustered job). Each job is coarse-grained enough to enable efficient execution and reduce scheduling overheads, while being fine-grained enough to fully utilize the resources offered by the hardware.
+
+There is a number of work on estimating the overall runtime of workflows \cite{Rubing2009, Calasanz2008, Truong2004, Uysal1998}. For example, the performance method by Duan et al. \cite{Rubing2009} is based on a hybrid Bayesian-neural network for predicting the execution time of workflow tasks. Bayesian network is a graphical modeling approach that we use to model the effects of different factors affecting the execution time (referred as factors or variables), and the interdependence of the factors among each other. However, it requires many parameters and a lot of parameter tuning, which is not feasible in practice. What distinguishes our work is: 1) We aim to provide a general but simple estimation model of the relationship between the overall runtime of a workflow and the resource cost. We assure that the model is useful in practice with less parameter training; 2) System overheads are included in our model to make it more precise and flexible in practice; 3) We especially focus on the task clustering problem and we use a hierarchical framework of computational activities. 
+
+
+\section{Related Work}
+
+
+Resource provisioning techniques have recently been developed to acquire resources for dedicated usage before execution starts and thus scheduling overheads can be reduced. Juve \cite{Juve2010a} has developed a resource provisioning tool called Wrangler to allocate resources for the exclusive use of a single user for a given period of time. This minimizes queuing delays because a user's jobs no longer compete with other jobs for access to resources. Villegas \cite{Villegas2012} presented a comprehensive and empirical performance-cost analysis of provisioning and allocation policies in IaaS clouds. They introduced a taxonomy of both types of policies, based on the type of information used in the decision process, and mapped to this taxonomy eight provisioning and four allocation policies. However, the problem with resource provisioning is that many grid sites do not allow users to take advantage of the feature \cite{Singh2005a}. Our approach further improves the overall runtime performance of workflows and reduces resource cost of workflow execution by dynamically adjusting the strategies of task clustering to ensure that a job is coarse-grained enough to enable efficient execution, while being fine-grained enough to fully utilize the available resources.
+
+
+There are two ways to achieve resource provisioning traditionally. In advanced reservation \cite{Castillo2008, Foster1999, Mcgough2005, Meinl2008}, a resource is configured to run only a single user's jobs on a given set of resources for a limited amount of time.  Elmroth \cite{Elmroth2009} proposed an algorithm to perform resource selection based on performance predictions and provided support for advance reservations. The algorithms proposed in their implementation perform resource selection based on performance predictions, and provide support for advance reservations as well as coallocation of multiple resources for coordinated use. However, advanced resource reservations is not always possible in all the Grid resources \cite{Singh2005a}, for instance, in the desktops resources where the local users has more priority to run their jobs. Our work has assumed resources are provisioned before the execution ever starts and we do not discuss the implementation of the specific resource provisioning tools. However, advanced reservation techniques can be introduced to our model as our future work. 
+
+The other way to do resource provisioning is to use pilot job \cite{Sfiligoi2008, Juve2010a}, in which resources are provisioned by submitting ordinary jobs (called pilot jobs) to the execution site. Instead of running an application task, the pilot jobs work as a remote resource manager configured to manage application tasks from an application-level scheduler hosted outside of this execution site. This is also called multi-level scheduling \cite{Raicu2007} or placeholder scheduling \cite{Pinchak2002}. However, users are required to estimate the resource usage before they ever start the execution, which may not be feasible in practice. Also, similar to advanced reservation, pilot jobs may not be supported in many execution sites. Compared to our work, similar to the case of advanced reservation, we do not differentiate the implementation of resource provisioning and both implementation can be used in our work. 
+
+%A decentralized resource allocation policy in minigrid is presented in \cite{Yang2007}. It is shown that the traditional resource allocating policies statically assign resources to the jobs according to the distribution schema computed by the job scheduling policy. Decentralized resource allocating policy is proposed to solve this problem by sharing the computing burden on several processors. However the existing decentralized policies cannot dynamically compute the dependent relationships of a given DAG or even schedule the data driven jobs. Ranjan \cite{Ranjan2008} proposed a decentralized and cooperative workflow scheduling algorithm. The proposed approach utilizes a Peer-to-Peer (P2P) coordination space with respect to coordinating the application schedules among the Grid wide distributed workflow brokers. Our initial work of resource aware clustering is based on centralized resource allocation services. However, our work can be easily extended to peer-to-peer scenario with limited modifications. 
+
+
+
+With the advance in resource provisioning, researchers have been trying to improve the efficiency of task scheduling \cite{Khajevand2012, Adamuthe2011, Huu2010, Pop2008, Yu2008}. Adamuthe et al. \cite{Adamuthe2011} proposed to use Genetic Algorithms to maximize the resource utilization and minimize job completion time under resource and time constraints. Khajevand \cite{Khajevand2012} proposed a Minimum First-fit Cost-Makespan Trade-off (MinFCMT) heuristic algorithm in order to effectively schedule an application in Utility Grids so that the application makespan and allocation-cost can be minimized. 
+Huu \cite{Huu2010} designed virtual infrastructures allocation strategies for cloud computing platforms, which size and topology are optimized according to some user-controlled metric, using the application expertise captured by the workflow representation. Pop \cite{Pop2008} presented a decentralized dynamic resource scheduling solution of large scale workflows onto distributed, heterogeneous Grid environments. Their work aims to optimize the scheduling performance and fault management. Yu \cite{Yu2008} aimed to improve the performance of scheduling workflows with rigid time constraints based on the estimation of resource state reliability. 
+However, task scheduling is still a NP-hard problem and the performance gain through task scheduling is limited by the complexity of scheduling algorithms. In our case, the runtime performance of task clustering depends on the ratio between computation, data transfer and system overheads and thus its performance gain is more significant than task scheduling in many distributed environments. 
+
+%In highly heterogeneous and distributed systems, like Grids, it is rather difficult to provide QoS to the users. Although the grid provides ready access to large pools of computational resources, the traditional approach to accessing these resources suffers from many overheads that lead to poor performance. Below we examine several techniques that are used to reduce these overheads. 
+
+%\textbf{Resource Utlization}
+%\cite{Tomas2012}  As reservations of resources may not always be possible, another possible way of enhancing the perceived QoS is by performing meta-scheduling of jobs in advance, where jobs are scheduled some time before they are actually executed. Thank to this, it is more likely that the appropriate resources are available to execute the job when needed. When using this type of scheduling, fragmentation appears and may become the cause of poor resource utilization. Because of that, some techniques are needed to perform rescheduling of tasks that may reduce the existing fragmentation. To this end, knowing the status of the system is a must. However, how to measure and quantify the existing fragmentation in a Grid system is a challenging task. This paper proposes different metrics aiming at measuring that fragmentation not only at resource level but also taking into account all the resources of the Grid environment as a whole. Finally, a performance evaluation of the proposed metrics over a real testbed is presented.
+
+Another approach besides task scheduling that attracts much attention is task reallocation. With the aim of dynamically balancing the computational load among resources, some jobs have to be moved from one resource to another and/or from one period of time to another, which is called task reallocation \cite{Tomas2012}. Caniou  \cite{Caniou2011} presented a reallocation mechanism that tunes parallel jobs each time they are submitted to the local resource manager (which implies also each time a job is migrated). They only needed to query batch schedulers with simple submission or cancellation requests.  Its authors also presented different reallocation algorithms and studied their behaviors in the case of a multi-cluster Grid environment. In \cite{Zhang2000}, a pre-emptive process migration method was proposed to dynamically migrate processes from overloaded nodes to lightly-loaded nodes. However, it can achieve a good balance only when there are some idle compute nodes (e.g. when the number of task processes is less than that of compute nodes). In our case with large scale scientific workflows, usually we have more tasks than available compute nodes. 
+%Also, the overheads associated with reallocation may influence the performance significantly during the runtime. 
+
+Adaptive execution is the third approach used to achieve the balance between resource cost and runtime performance. Due to the inherently dynamic characteristics of the resources and the occasional unpredictable behavior of the workflow tasks, the workflow execution plan may require variations to meet the desired Quality of Service objectives. Previous research \cite{Lee2008, Sakellariou2004, Yu2007} has considered enabling workflows to adapt to changing resource availability by re-planning portions of workflow. The problem considered by this approach is the inverse of the one addressed by resource provisioning. In their model, the workflows must adapt to changing resource availability rather than the resource availability adapting to changing workflows. This approach has to halt the execution of the original plan and enact a new execution plan, which is very costly to perform. Kalayci \cite{Kalayci2010} proposed a new adaption approach  that operates at the sub-workflow level and has lower overheads. In contrast, our work adjust the strategies of task clustering and resource provisioning together. Such a hybrid approach provides us a better scalability and adaption to the dynamic environments. 
+
+\section{Planned Work}
+
+We plan to develop resource-aware task clustering methods and discuss their runtime performance and overall resource utilization. 
+
+The first goal is to determine if we can predict the runtime of real workflows with enough accuracy for it to be useful based on only predictions of the total CPU hour, critical path (the longest path from the root task to the exit task), max width (the maximum parallelism degree of a workflow), and number of resources for workflow execution. The disadvantage of many traditional workflow estimation models is that they involve many assumptions and require tuning a lot of parameters, which is not feasible in practice. In our work, we aim to use as few parameters as possible and assure that the model is simple but effective in practice. 
+
+Once we have answered these questions, we can use the model we developed to create a task clustering algorithm for resource provisioning tools, which involves partitioning the workflow and predicting the number of resources, overall runtime and data storage required for each partition. We also aim to examine a workflow and develop an estimate that can be used to provision VMs on a cloud (i.e., Amazon EC2) and predict the cost of running workflows. We can also improve the provisioning algorithms with deadline and budget constraints proposed in \cite{Malawski2012}.
+
+Another concern we will focus on is the probability of under/over-predicting the workflow wall time. We aim to have an estimate of the overall runtime that is roughly closed to the actual overall runtime (i.e., 90\%). It would be easy to achieve 100\% accuracy by just doubling or tripling a crude estimate, but that is not feasible in practice. We would like to know how much the overall runtime of a workflow varies over repeated runs of the same workflow.
+
+One further problem with the experiment we are about to undertake is that we initially assume that we have perfect estimates. In other words, we plan to use the actual runtime of the tasks from experiments to build a model that predicts the overall runtime of a workflow. In doing that we are basically assuming we have a perfect estimate. It would be interesting to take our perfect estimate and make it imperfect by increasing the variance of task runtime to see how our prediction changes. We thus can answer a question: How accurate do our task runtimes need to be in order to get a workflow overall runtime prediction with a given accuracy?
+
+%Finally, we plan to extend the current work to consider a statistical distribution of the historical runtimes for similar tasks. Tasks share similar characteristics such as memory requirement and I/O requirement are more likely to have the same runtimes. 
+
+\section{Research Plan}
+
+We have presented the current status of our work and outlined the tasks that are required to address the research questions proposed in this dissertation proposal. We next introduce a tentative thesis plan in three phases. 
+
+Phase I (May-Oct, 2013)
+
+In this period, we build the theoretic model of resource provisioning and build a system platform to evaluate our results. 
+
+\begin{enumerate}
+\item Develop the theoretical model used in resource-aware task clustering. 
+
+In this period, analyze the theoretic relationship between overall runtime of workflows and the number of resources used. 
+
+\item Use Amazon EC2 to build a system and test the environment. 
+
+In this period, build/use a cloud-provisioning system on top of Amazon EC2. 
+
+\item Collect traces of applications
+
+In this period, collect the runtime traces of different applications including Montage and Periodograms. Then use simulators to vary the parameters and evaluate the accuracy of the prediction based on workflow characteristics such as overall runtime, critical path and resource characteristics such as the number of resources to use. 
+
+\end{enumerate}
+Phase II (Nov 2013 - Jan  2014)
+\begin{enumerate}\item Implement algorithms and techniques used in resource-aware task clustering. 
+
+Develop resource-aware task clustering algorithms to partition a workflow and predict the number of resources and overall runtime required for each partition. 
+
+\item Develop an estimation method to be used to provision VMs on a cloud and to predict the cost of running workflows. Furthermore, improve provisioning algorithms with deadline and budget constraints. 
+
+\item Integrate the algorithms with an existing resource provisioning tool 
+
+Extend the DAG workflow to MPI workflow and integrate the algorithms used in theoretic analysis into a resource provisioning tool and then compare its performance with different workflow instances. 
+
+\item Data processing and analysis  
+
+Present and visualize the results and conclude the performance. 
+\end{enumerate}
+Phase III (Feb-Apr, 2014)
+
+\begin{enumerate}
+\item Thesis write-up.
+\end{enumerate}

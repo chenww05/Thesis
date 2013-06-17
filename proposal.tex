@@ -1,0 +1,115 @@
+\documentclass[final]{USC-Thesis-Modified}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[titles]{tocloft}    %for changing table of contents
+\usepackage{setspace}
+\usepackage{color}
+\usepackage{fancyvrb}
+\usepackage[normalsize,bf]{caption} % Get bold figure and table names
+\usepackage{subfig} % Must go after caption
+\usepackage{multirow}
+\usepackage{algorithm,algpseudocode}
+\usepackage{comment}
+\usepackage{placeins}
+\usepackage[titletoc]{appendix}
+\usepackage[bookmarks,pdfusetitle,bookmarksnumbered=true]{hyperref}
+
+
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage{float}
+
+
+
+\setlength{\intextsep}{6.0pt plus 1.0pt minus 2.0pt}
+
+
+\usepackage{array}
+
+
+% I defined this to get more appealing whitespace in tables
+\let\oldhline = \hline
+\renewcommand{\hline}{  
+    \\[-1.0em] \oldhline \\[-1.0em]
+}
+
+\numberwithin{equation}{chapter}
+\numberwithin{figure}{chapter}
+
+\pdfinfo{
+   /Author (Weiwei Chen)
+   /Title (Task Clustering for Large-Scale Scientific Workflows)
+   /CreationDate (D:20120413000000)
+   /Subject (Workflows)
+   /Keywords (Workflows;Clustering)
+}
+
+\hypersetup {
+	% Set to false to get useful boxes and colors
+	colorlinks=true,	% false: boxed links; true: text links
+	% This forces all the text links to be black so that it doesn't upset the editors
+	linkcolor=black,	% color of internal links
+	citecolor=black,	% color of links to bibliography
+	filecolor=black,	% color of file links
+	urlcolor=black		% color of external links
+}
+
+
+
+\begin{document}
+
+\title{Task Clustering for Large-Scale Scientific Workflows}
+
+\author{Weiwei Chen}
+\major{Computer Science}
+\month{May}
+\year{2013}
+
+\maketitle
+
+%\dedication
+%    \begin{quote}
+ %       \raggedleft {\em To x,y}\\
+ %       \raggedleft {\em and especially to z.}
+%    \end{quote}
+
+
+%\topmatter{Acknowledgments}
+%Your Acknowledgments
+
+
+% Table Of Contents
+\tableofcontents
+
+% List of tables
+\listoftables
+
+% List of figures
+\listoffigures
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+
+% Begin Body
+\mainmatter
+
+
+\input{introduction.tex}
+\input{model.tex}
+\input{balance.tex}
+\input{partitioning.tex}
+\input{tolerance.tex}
+\input{plan.tex}
+\input{publications.tex}
+
+
+\bibliographystyle{abbrv}
+\bibliography{references}
+%\bibliography{bibliography} % Add here your bibliography file
+
+%\input{appendix2.2.tex}
+%\input{publications.tex}
+%\input{appendixB.tex}
+
+\end{document}
