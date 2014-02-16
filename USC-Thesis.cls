@@ -2,9 +2,11 @@
 %% University of Southern Califirnia Ph.D. Thesis class.
 %% For Latex 2.09 or later (i.e. where \documentclass is used).
 %% 
-%% Originally written on: May, 2000
-%% Last revised: Mon Nov 12 00:01:17 PST 2001
-%% 
+%% Created: May 2000 by Zufar Mulyukov
+%% Revised: Nov 12 2001 by Zufar Mulyukov
+%% Revised: May 28 2009 by A. C. Cassidy
+%% Revised: Dec 14 2012 by Gideon Juve
+%%
 %% Refer to  http://www.usc.edu/dept/GRADSCHL/curr_student/format.htm
 %%
 %% This minimal USC Ph.D thesis class is partially based on
@@ -67,16 +69,16 @@
 %%         \raggedleft {\em to ...}
 %%     \end{quote}
 %% 
-%% \tableofcontents     % Table Of Contents
+%% \tableofcontents 	% Table Of Contents
 %% 
-%% \listoffigures   % List of figures
+%% \listoffigures	% List of figures
 %% 
-%% \listoftables    % List of tables
+%% \listoftables	% List of tables
 %% 
 %% \topmatter{Preface}  % Preface with acknowlegements, etc.
 %% \input{preface.tex}
 %% 
-%% \mainmatter      % Begin Body
+%% \mainmatter 		% Begin Body
 %% 
 %% \part{Break up of the Hydrogen Molecular Ion by an Electric Field}
 %% \input{ATOM/h2plus.tex}
@@ -87,16 +89,15 @@
 %% \bibliographystyle{alpha}   
 %% \bibliography{references}
 %% 
-%% \appendix        % appendix is standard from latex report class.
+%% \appendix    	% appendix is standard from latex report class.
 %% \input{appendix.tex}
 %% \end{document}
 %% -------------------------------------
 %%
 \NeedsTeXFormat{LaTeX2e}[1995/06/01]
-\ProvidesClass{USC-Thesis}[2000/07/15]
+\ProvidesClass{USC-Thesis}[2011/12/14]
 \typeout {This document is formatted by USC-Thesis latex class  in accordance 
- with Ph.D. thesis format requirements of University of Southern California. 
- Use at your own risk!}
+ with Ph.D. thesis format requirements of University of Southern California.}
 
 \RequirePackage{setspace}[1998/04/8]
 \newcommand{\properspacing}{\setstretch{1.6}} %default spacing
@@ -105,7 +106,7 @@
 \DeclareOption{draft}{\renewcommand{\properspacing}{\singlespacing}}
 
 \DeclareOption*{
-\PassOptionsToClass{\CurrentOption}{report} 
+ \PassOptionsToClass{\CurrentOption}{report}
 }
 \ProcessOptions\relax
 
@@ -113,9 +114,13 @@
 
 %% This is to set font to times roman (stolen from file times.sty)
 %% If you want to use default font remove next 3 lines. 
-%\renewcommand{\sfdefault}{phv}
-%\renewcommand{\rmdefault}{ptm}
-%\renewcommand{\ttdefault}{pcr}
+\renewcommand{\sfdefault}{phv}
+\renewcommand{\rmdefault}{ptm}
+\renewcommand{\ttdefault}{pcr}
+
+%% Reduce the size of the chapter titles
+\let\Huge=\LARGE
+\let\huge=\LARGE
 
 %% Set the correct interline spacing. 
 \properspacing
@@ -145,128 +150,128 @@
  
 
 %% \maketitle command to make Ph.D. title page
-%% Can somebody write a universal thesis class for future generations?
 \renewcommand{\maketitle}{
   \begin{titlepage}%
-   \doublespacing
+   \singlespacing
    \setcounter{page}{0}%
     \null
-    \vfill\vfill
+    %\vfill%\vfill
     \begin{center}%
+      %\vskip 1.06 true in
       \MakeUppercase{\@title} \par
-      \vskip 0.16 true in
+      \vskip 1.625 true in%
       by%
-      \vskip 0.16 true in
-      {\begin{tabular}[t]{c}\@author\\*[1.0 true in]%
-% Edited by Farnoush
-%       \hline
-       \rule{5.0 true in}{0.025 true in}
-       \end{tabular}%
-       \par}
+      \vskip 0.75 true in%
+      \@author
+      \vskip 1.0 true in%
+      \rule[0.0cm]{\linewidth}{0.03cm} 
       \vskip 1.0 true in
-
-% Edited (Added) by Farnoush
-\singlespace 
-
       A Dissertation Presented to the     \\
-      FACULTY OF THE USC GRADUATE SCHOOL      \\
+      FACULTY OF THE USC GRADUATE SCHOOL  \\
       UNIVERSITY OF SOUTHERN CALIFORNIA   \\
       In Partial Fulfillment of the       \\
       Requirements for the Degree         \\
       DOCTOR OF PHILOSOPHY                \\
       \MakeUppercase{(\@major)}           \\*[1.0 true cm]%
-
-% Edited (Added) by Farnoush
-%\doublespace 
-
-      \vfill
-      {\small \@month \ \@year \par}%   should be just month and year
+      %\vfill
+      \vskip 0.25 true in%
+      {\@month \ \@year \par}%   should be just month and year
     \end{center}%
     \par
-    \vfill
-      \begin{center}%
-        {\normalsize\ Copyright~ \@year\ \hfill ~\@author}%
-      \end{center}%
+    %\vfill
+    \vskip 0.61 true in
+    \begin{center}%
+      {\normalsize\ Copyright~ \@year\ \hfill ~\@author}%
+    \end{center}%
  \end{titlepage}
    \pagenumbering{roman}
    \addtocounter{page}{1}
 }
 
-
 %% Make the table of contents, list of figs and list of tables
 %% single spaced
 %%
-
-\renewcommand\contentsname{Table of Contents}
 \let\oldtableofcontents = \tableofcontents
 \renewcommand{\tableofcontents}{ 
-\newpage
+    \clearpage
+    % Add a bookmark in the PDF even though there is no entry for the ToC in the ToC
+    \pdfbookmark[0]{\contentsname}{toc}
     \pagestyle{plain}
     \begin{singlespace} 
     \oldtableofcontents 
-    \end{singlespace}}
+    \end{singlespace}
+}
+
+% This is a new chapter-level counter for the non-numbered sections to fix hyperref links
+\newcounter{nochapter}
 
 \let\oldlistoftables = \listoftables
 \renewcommand{\listoftables}{
-\newpage
-\addcontentsline{toc}{chapter}{\listtablename}
+    \clearpage
+    \refstepcounter{nochapter}% This is so that the hyperref points to the correct place
+    \addcontentsline{toc}{chapter}{\listtablename}
     \pagestyle{plain}
     \begin{singlespace} 
     \oldlistoftables 
-    \end{singlespace}}
+    \end{singlespace}
+}
 
 \let\oldlistoffigures = \listoffigures
 \renewcommand{\listoffigures}{  
-\newpage
+    \clearpage
+    \refstepcounter{nochapter}% This is so that the hyperref points to the correct place
     \addcontentsline{toc}{chapter}{\listfigurename}
     \pagestyle{plain}
     \begin{singlespace} 
     \oldlistoffigures
-    \end{singlespace}}
+    \end{singlespace}
+}
 
-% changed by reza
-%\renewcommand{\bibname}{References}  
-\renewcommand{\bibname}{Bibliography}    
-
+\renewcommand{\bibname}{Bibliography}
 \let\oldbibliography = \bibliography
 \renewcommand{\bibliography}[1]{
+    \cleardoublepage% Clear double page so that the page number comes out right
+    \refstepcounter{nochapter}% This is so that the hyperref points to the correct place
+    \addcontentsline{toc}{chapter}{\bibname}
     \pagestyle{plain}
-    \begin{singlespace} 
+    \begin{singlespace}
     \oldbibliography{#1}
-    \end{singlespace}}
-
-\renewenvironment{thebibliography}[1]
-     {\chapter*{\bibname
-        \addcontentsline{toc}{chapter}{\bibname}
-        \@mkboth{\MakeUppercase\bibname}{\MakeUppercase\bibname}}%
-\begin{singlespace} %
-      \list{\@biblabel{\@arabic\c@enumiv}}%
-           {\settowidth\labelwidth{\@biblabel{#1}}%
-            \leftmargin\labelwidth
-            \advance\leftmargin\labelsep
-            \@openbib@code
-            \usecounter{enumiv}%
-            \let\p@enumiv\@empty
-            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
-      \sloppy
-      \clubpenalty4000
-      \@clubpenalty \clubpenalty
-      \widowpenalty4000%
-      \sfcode`\.\@m}
-     {\def\@noitemerr
-       {\@latex@warning{Empty `thebibliography' environment}}%
-      \endlist
-\end{singlespace}
+    \end{singlespace}
 }
 
-% Even though lists of figures  are single-spaced, Editor requires
+%%ACC don't think I`m using this
+%\renewenvironment{thebibliography}[1]
+%     {\chapter*{\bibname
+%        \addcontentsline{toc}{chapter}{\bibname}
+%        \@mkboth{\MakeUppercase\bibname}{\MakeUppercase\bibname}}%
+%\begin{singlespace} %
+%      \list{\@biblabel{\@arabic\c@enumiv}}%
+%           {\settowidth\labelwidth{\@biblabel{#1}}%
+%            \leftmargin\labelwidth
+%            \advance\leftmargin\labelsep
+%            \@openbib@code
+%            \usecounter{enumiv}%
+%            \let\p@enumiv\@empty
+%            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+%      \sloppy
+%      \clubpenalty4000
+%      \@clubpenalty \clubpenalty
+%      \widowpenalty4000%
+%      \sfcode`\.\@m}
+%     {\def\@noitemerr
+%       {\@latex@warning{Empty `thebibliography' environment}}%
+%      \endlist
+%\end{singlespace}
+%}
+
+% Even though lists of figures are single-spaced, Editor requires
 % double spacing between the items in the lists. 
-\let\oldcaption = \caption
-\renewcommand{\caption}[1]{
-    \oldcaption{#1}
-        \addtocontents{lof}{\protect\addvspace{10\p@}}%
-        \addtocontents{lot}{\protect\addvspace{10\p@}}%
-}
+%\let\oldcaption = \caption
+%\renewcommand{\caption}[1]{
+%    \oldcaption{#1}
+%    \addtocontents{lof}{\protect\addvspace{10\p@}}%
+%    \addtocontents{lot}{\protect\addvspace{10\p@}}%
+%}
 
 
 %%
@@ -279,8 +284,8 @@
 %%
 \newcommand{\topmatter}[1]{
     \pagestyle{plain}
-        \chapter*{#1}
-        \addcontentsline{toc}{chapter}{#1}
+    \chapter*{#1}
+    \addcontentsline{toc}{chapter}{#1}
 }
 
 %%
@@ -297,16 +302,16 @@
 %%        \raggedleft {\em to my parents}
 %%    \end{quote}
 \newcommand{\dedication}{
-\pagestyle{plain}
-        \chapter*{}
-        \addcontentsline{toc}{chapter}{Dedication}
+    \pagestyle{plain}
+    \chapter*{}
+    \addcontentsline{toc}{chapter}{Dedication}
 }
 
 %% Same as dedication, but puts the word Epigraph in the table of contents
 \newcommand{\epigraph}{
-\pagestyle{plain}
-        \chapter*{}
-        \addcontentsline{toc}{chapter}{Epigraph}
+    \pagestyle{plain}
+    \chapter*{}
+    \addcontentsline{toc}{chapter}{Epigraph}
 }
 
 %%
@@ -317,20 +322,21 @@
 %%       Use once before the first numbered \chapter.
 %%
 \newcommand{\mainmatter}{
-        \clearpage
-        \pagestyle{plain}
-        \pagenumbering{arabic}
+    \clearpage
+    \pagestyle{plain}
+    \pagenumbering{arabic}
     \sloppy
 }
 
 %% Redefine plain style page to move the page number to the lower
 %% right corner.
 %%
-\renewcommand{\ps@plain}{%
-  \renewcommand{\@oddhead}{}%
-  \renewcommand{\@evenhead}{}%
-  \renewcommand{\@evenfoot}{\hfil\textrm{\thepage}}%
-  \renewcommand{\@oddfoot}{\@evenfoot}}%
+\renewcommand{\ps@plain}{
+    \renewcommand{\@oddhead}{}
+    \renewcommand{\@evenhead}{}
+    \renewcommand{\@evenfoot}{\hfil\textrm{\thepage}}
+    \renewcommand{\@oddfoot}{\@evenfoot}
+}
 
 
 %%
@@ -359,19 +365,30 @@
 %% space before the line ``Chapter ...''. If you want to return to standard
 %% formatting - uncomment  \vspace*{50\p@}%  line
 %%
-\def\@makechapterhead#1{%
-%  \vspace*{50\p@}%   % standard is 50\p@ 
+\def\@makechapterhead#1{
+  %\vspace*{50\p@}%   % standard is 50\p@ 
   {\parindent \z@ \raggedright \normalfont
     \ifnum \c@secnumdepth >\m@ne
         \huge\bfseries \@chapapp\space \thechapter
         \par\nobreak
-       \vskip 20\p@ %standard is 20
+        \vskip 20\p@ %standard is 20\p@
     \fi
     \interlinepenalty\@M
     \Huge \bfseries #1\par\nobreak
-    \vskip 20\p@ %standard is 40
-  }}
+    \vskip 40\p@ %standard is 40\p@
+  }
+}
 
+% This is designed to match the above. I used it for my single appendix, which
+% was not supposed to have a letter (i.e. "Appendix" not "Appendix A")
+\def\@makeschapterhead#1{
+  %\vspace*{50\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \interlinepenalty\@M
+    \Huge \bfseries #1\par\nobreak
+    \vskip 40\p@
+  }
+}
 
 %% Redefine maximum fraction of the page that floats (figs, etc.) can
 %% occupy. This prevents creating pages with only small figure on them.
@@ -380,25 +397,51 @@
 \renewcommand{\floatpagefraction}{.9}  % default is 0.5
 
 
-%% Added by TS @11-06-2008:
-%% Put 'Chapter:' in TOC to the chapter titles 
-%% (this part is copied form another version of frequently used style 
-%%  file USCthesis.sty)
-%%
-\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
-                         \refstepcounter{chapter}%
-                         \typeout{\@chapapp\space\thechapter.}%
-                         \addcontentsline{toc}{chapter}%
-                                   {Chapter \protect\numberline{\thechapter:}#1}%
-                    \else
-                      \addcontentsline{toc}{chapter}{Chapter: #1}%
-                    \fi
-                    \chaptermark{#1}%
-                    %\addtocontents{lof}{\protect\addvspace{10\p@}}%
-                    %\addtocontents{lot}{\protect\addvspace{10\p@}}%
-                    \if@twocolumn
-                      \@topnewpage[\@makechapterhead{#2}]%
-                    \else
-                      \@makechapterhead{#2}%
-                      \@afterheading
-                    \fi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Changes to the table of contents   %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage[titles]{tocloft}
+
+% Change name of toc from 'Contents' to 'Table of Contents'
+\renewcommand{\contentsname}{Table of Contents}
+
+% Margins of toc, lof, lot - so that the page numbers in toc,lof,lot do 
+% not align with page number of the page they are on
+\cftsetrmarg{0.7in}
+\newlength{\numtomarg}
+\setlength{\numtomarg}{0.2in}
+\renewcommand{\cftchapafterpnum}{\hbox to \numtomarg{\hss}}
+\renewcommand{\cftsecafterpnum}{\hbox to \numtomarg{\hss}}
+\renewcommand{\cftsubsecafterpnum}{\hbox to \numtomarg{\hss}}
+\renewcommand{\cftfigafterpnum}{\hbox to \numtomarg{\hss}}
+\renewcommand{\cfttabafterpnum}{\hbox to \numtomarg{\hss}}
+
+% No fat spaces between chapters in lof, lot
+\newcommand*{\noaddvspace}{\renewcommand*{\addvspace}[1]{}}
+\addtocontents{lof}{\protect\noaddvspace}
+\addtocontents{lot}{\protect\noaddvspace}
+
+% Double space between entries in toc, lot, lof
+\setlength{\cftbeforechapskip}{10pt}
+\setlength{\cftbeforefigskip}{10pt}
+\setlength{\cftbeforetabskip}{10pt}
+
+% Change font of chapter and page numbers from boldface to normal
+\renewcommand{\cftchapfont}{\normalfont}
+\renewcommand{\cftchappagefont}{\normalfont}
+
+% Add 'Chapter' before the chapter number in toc
+%\renewcommand{\cftchappresnum}{Chapter} 
+\renewcommand{\cftchapaftersnum}{: }
+%\settowidth{\cftchapnumwidth}{Chapter 10: }
+
+% Add 'Table' before table number in list of tables
+\renewcommand{\cfttabpresnum}{Table }
+\renewcommand{\cfttabaftersnum}{: }
+\settowidth{\cfttabnumwidth}{Table 10.10: }
+
+% Add 'Figure' before figure number in list of figures
+\renewcommand{\cftfigpresnum}{Figure }
+\renewcommand{\cftfigaftersnum}{: }
+\settowidth{\cftfignumwidth}{Figure 10.10: }
