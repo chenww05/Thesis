@@ -1,4 +1,4 @@
-\documentclass[final]{USC-Thesis-Modified}
+\documentclass[final]{USC-Thesis}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[titles]{tocloft}    %for changing table of contents
@@ -13,6 +13,7 @@
 \usepackage{placeins}
 \usepackage[titletoc]{appendix}
 \usepackage[bookmarks,pdfusetitle,bookmarksnumbered=true]{hyperref}
+
 
 
 \usepackage{makeidx}  % allows for indexgeneration
@@ -92,6 +93,27 @@
 % Begin Body
 \mainmatter
 
+% Redefine acl so that it adds "Chapter" prefix to chapters
+\let\oldacl=\addcontentsline
+\def\addcontentsline#1#2#3{%
+	%Check if writing to ToC and appropriate section.
+	\def\tempa{#1}
+	\def\tempb{toc}
+	\ifx\tempa\tempb
+		%Adding to the ToC file, so check on the sectioning command.
+		\def\tempa{#2}\def\tempb{chapter}
+		\ifx\tempa\tempb
+			%The sectioning command is chapter
+			\oldacl{#1}{#2}{Chapter\space #3}%
+		\else
+			%Call the original \addcontentsline.
+			\oldacl{#1}{#2}{#3}% 
+		\fi
+	\else
+		%Adding to a file that is not the ToC. Call the original \addcontentsline.
+		\oldacl{#1}{#2}{#3}%
+	\fi
+}
 
 \input{introduction.tex}
 \input{model.tex}
@@ -104,7 +126,7 @@
 
 \bibliographystyle{abbrv}
 \bibliography{references}
-%\bibliography{bibliography} % Add here your bibliography file
+%\bibliography{bibliography} 
 
 %\input{appendix2.2.tex}
 %\input{publications.tex}
