@@ -13,6 +13,7 @@
 \usepackage{placeins}
 \usepackage[titletoc]{appendix}
 \usepackage[bookmarks,pdfusetitle,bookmarksnumbered=true]{hyperref}
+\usepackage{bm}
 
 
 
@@ -39,7 +40,7 @@
 \pdfinfo{
    /Author (Weiwei Chen)
    /Title (Task Clustering for Large-Scale Scientific Workflows)
-   /CreationDate (D:20120413000000)
+   /CreationDate (D:20140513000000)
    /Subject (Workflows)
    /Keywords (Workflows;Clustering)
 }
@@ -62,7 +63,7 @@
 
 \author{Weiwei Chen}
 \major{Computer Science}
-\month{May}
+\month{Jun}
 \year{2014}
 
 \maketitle
@@ -85,9 +86,10 @@
 % List of figures
 \listoffigures
 
-\begin{abstract}
+\topmatter{Abstract}
 \input{abstract.tex}
-\end{abstract}
+
+\mainmatter
 
 
 % Begin Body
@@ -117,10 +119,9 @@
 
 \input{introduction.tex}
 \input{model.tex}
-\input{balance.tex}
 \input{partitioning.tex}
+\input{balance.tex}
 \input{tolerance.tex}
-\input{plan.tex}
 \input{publications.tex}
 
 
