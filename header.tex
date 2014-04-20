@@ -1,0 +1,108 @@
+\documentclass{USC-Thesis}
+\usepackage{amsmath}
+
+\usepackage{makeidx}
+%\usepackage[linktocpage,breaklinks,pdftex,letterpaper]{hyperref} % linktocpage deals with broken tables of contents
+\renewcommand{\paragraph}[1]{\vskip 6pt\noindent\textbf{#1 }}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{algorithm,algpseudocode}
+%\usepackage{algorithmic}
+\usepackage{multirow}
+\usepackage[multidot]{grffile}
+\usepackage{url}
+\usepackage{txfonts}
+\usepackage{xspace}
+\usepackage{subfig}
+\usepackage{caption}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{bm}
+\usepackage[bookmarks,pdfusetitle,bookmarksnumbered=true]{hyperref}
+
+% begin longtable tweak
+\makeatletter
+\let\saved@longtable\longtable
+\long\def\foo#1\LT@err#2#3#4!!{\def\longtable{#1#4}}
+\expandafter\foo\longtable!!
+
+\long\def\foo#1\@outputpage#2\@outputpage#3!!{%
+\def\LT@output{#1\@opcol#2\@opcol#3}}
+\expandafter\foo\LT@output!!
+\makeatother
+% end longtable tweak
+
+\newcommand\MyBox[3]{
+  \fbox{\lower0.75cm
+    \vbox to 1.7cm{\vfil
+      \hbox to 1.7cm{\hfil\parbox{1.4cm}{#1\\#2\\#3}\hfil}
+      \vfil}%
+  }%
+}
+
+\newcommand{\V}[1]{{\mbox{\textit{#1}}}}  % \V for variable
+\newcommand{\VS}[1]{{\mbox{\textit{\small #1}}}}  % \V for variable-small
+\newcommand{\VVS}[1]{{\mbox{\textit{\scriptsize #1}}}}  % \V for tiny
+\newcommand{\Census}[1]{\mbox{$\mbox{\textit{C}}_{\mbox{\scriptsize
+        \textit{#1}}}$}}
+
+%
+% these parameters are to play with global figures sizes
+%
+\newlength{\outagewidth}  \setlength{\outagewidth}{\textwidth}
+\newlength{\doublegraphwidth}  \setlength{\doublegraphwidth}{.35\textwidth}
+\newlength{\triplegraphwidth}  \setlength{\triplegraphwidth}{.28\textwidth}
+
+% next command: ugly, but saves space
+% use as: (\Section{\ref{sec:energy_harvesting}}).
+%\newcommand{\Section}[1]{\S{#1}}
+\newcommand{\Section}[1]{Section~{#1}}
+\newcommand{\Sections}[2]{\S{#1} and \S{#2}}
+%\newcommand{\Sections}[2]{Sections~{#1} and~\S{#2}}
+
+
+%
+% Kannan's suggestions about maximizing floats:
+% (images)
+%
+\newcommand{\RelaxFloats}{
+	\renewcommand{\topfraction}{0.9}
+	\renewcommand{\floatpagefraction}{0.9}
+	\renewcommand{\textfraction}{0.1}
+}
+\RelaxFloats
+\usepackage{amssymb}
+\usepackage[usenames,dvipsnames]{color}  % http://en.wikibooks.org/wiki/LaTeX/Colors
+
+\usepackage{alltt}
+
+\renewcommand{\emptyset}{\varnothing}
+\newcommand\comment[1]{\textbf{\sffamily\color{blue}[xxx: #1]}}
+\newcommand\ql[1]{\textbf{\sffamily\color{red}[xxx: #1]}}
+% \renewcommand\comment[1]{}
+\newcommand\PostSubmission[1]{}
+%\renewcommand\PostSubmission[1]{\textbf{\sffamily\color{blue}[xxx: #1]}}
+\definecolor{DarkGreen}{rgb}{0,0.75,0}
+\newcommand\PreFiling[1]{}
+\renewcommand\PreFiling[1]{\textbf{\sffamily\color{DarkGreen}[xxx-prefiling: #1]}}
+\newcommand\PreFilingNote[1]{\textbf{\sffamily\color{DarkGreen}[xxx-prefiling-note: #1]}}
+\newcommand{\Survey}[1]{\mbox{$\mbox{\textit{S}}_{\mbox{\scriptsize \textit{#1}}}$}}
+\newcommand{\twoldots}{\,.\,.\,}
+\newcommand{\History}[1]{\mbox{$\mbox{\textit{H}}_{\mbox{\scriptsize \textit{#1}}}$}}
+%\newcommand{\SuperSurvey}[1]{\mbox{$\mbox{\textit{SS}}_{\mbox{\scriptsize \textit{#1}}}$}}
+\newcommand{\AllInternet}[1]{\mbox{$\mbox{\textit{A}}_{\mbox{\scriptsize \textit{#1}}}$}}
+  \newcommand{\WSite}{w}
+  \newcommand{\CSite}{c}
+  \newcommand{\JSite}{j}
+\newcommand{\MyParagraph}[1]{\textbf{#1:}}  % lighter-weight \paragraph{}
+\newcommand{\rateclaim}[1]{#1}
+
+\newif\ifisready
+\isreadyfalse
+
+\newif\ifislong
+\islongtrue
+
+\newif\ifsigcomm
+\sigcommfalse
