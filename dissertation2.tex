@@ -1,0 +1,129 @@
+\documentclass[final]{USC-Thesis}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[titles]{tocloft}    %for changing table of contents
+\usepackage{setspace}
+\usepackage{color}
+\usepackage{fancyvrb}
+\usepackage[normalsize,bf]{caption} % Get bold figure and table names
+\usepackage{subfig} % Must go after caption
+\usepackage{multirow}
+\usepackage{algorithm,algpseudocode}
+\usepackage{comment}
+\usepackage{placeins}
+\usepackage[titletoc]{appendix}
+\usepackage{bm}
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage{float}
+\usepackage[bookmarks,pdfusetitle,bookmarksnumbered=true]{hyperref}
+
+
+\setlength{\intextsep}{6.0pt plus 1.0pt minus 2.0pt}
+
+
+\usepackage{array}
+
+
+% I defined this to get more appealing whitespace in tables
+\let\oldhline = \hline
+\renewcommand{\hline}{  
+    \\[-1.0em] \oldhline \\[-1.0em]
+}
+
+\numberwithin{equation}{chapter}
+\numberwithin{figure}{chapter}
+
+\pdfinfo{
+   /Author (Weiwei Chen)
+   /Title (Task Clustering for Large-Scale Scientific Workflows)
+   /CreationDate (D:20140513000000)
+   /Subject (Workflows)
+   /Keywords (Workflows;Clustering)
+}
+
+\hypersetup {
+	% Set to false to get useful boxes and colors
+	colorlinks=true,	% false: boxed links; true: text links
+	% This forces all the text links to be black so that it doesn't upset the editors
+	linkcolor=black,	% color of internal links
+	citecolor=black,	% color of links to bibliography
+	filecolor=black,	% color of file links
+	urlcolor=black		% color of external links
+}
+
+
+
+\begin{document}
+\input{Macros.tex}
+\title{Task Clustering for Large-Scale Scientific Workflows}
+
+\author{Weiwei Chen}
+\major{Computer Science}
+\month{Jun}
+\year{2014}
+
+\maketitle
+
+\topmatter{Dedication}
+  \begin{quote}
+  To my beloved parents.
+  \end{quote}
+
+
+%\input{acknowledgments.tex}
+
+\newpage
+\tableofcontents
+\newpage
+\listoftables
+\newpage
+\phantomsection \label{listoffig}
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+
+
+\topmatter{Abstract}
+  \input{abstract.tex}
+
+
+% Begin Body
+\mainmatter
+
+% Redefine acl so that it adds "Chapter" prefix to chapters
+\let\oldacl=\addcontentsline
+\def\addcontentsline#1#2#3{%
+	%Check if writing to ToC and appropriate section.
+	\def\tempa{#1}
+	\def\tempb{toc}
+	\ifx\tempa\tempb
+		%Adding to the ToC file, so check on the sectioning command.
+		\def\tempa{#2}\def\tempb{chapter}
+		\ifx\tempa\tempb
+			%The sectioning command is chapter
+			\oldacl{#1}{#2}{Chapter\space #3}%
+		\else
+			%Call the original \addcontentsline.
+			\oldacl{#1}{#2}{#3}% 
+		\fi
+	\else
+		%Adding to a file that is not the ToC. Call the original \addcontentsline.
+		\oldacl{#1}{#2}{#3}%
+	\fi
+}
+
+\input{introduction.tex}
+\input{model.tex}
+\input{partitioning.tex}
+\input{balance.tex}
+\input{tolerance.tex}
+\input{publications.tex}
+\input{related.tex}
+
+\bibliographystyle{abbrv}
+\bibliography{references}
+
+%\input{appendix2.2.tex}
+%\input{publications.tex}
+%\input{appendixB.tex}
+
+\end{document}
