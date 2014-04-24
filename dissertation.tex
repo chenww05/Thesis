@@ -2,7 +2,7 @@
 
 \begin{document}
 
-\title{Task Clustering for Large-Scale Scientific Workflows}
+\title{Optimizing Task Granularity for Large-Scale Scientific Workflows}
 \author{Weiwei Chen}
   \major{Computer Science}
   \month{Jun}
@@ -14,15 +14,15 @@
   To my family.
   \end{quote}
 
-  \input{acknowledgements.tex}
+% \input{acknowledgements.tex}
 
 \newpage
 \tableofcontents
 \newpage
 \listoftables
 \newpage
-\phantomsection \label{listoffig}
-\addcontentsline{toc}{chapter}{List of Figures}
+%\phantomsection \label{listoffig}
+%\addcontentsline{toc}{chapter}{List of Figures}
 \listoffigures
 %\newpage
 %\phantomsection \label{listofalg}
@@ -34,13 +34,14 @@
   \input{abstract.tex}
 
 \mainmatter
-
 \input{introduction.tex}
+\input{related.tex}
 \input{model.tex}
+\input{workflowsim.tex}
 \input{partitioning.tex}
 \input{balance.tex}
 \input{tolerance.tex}
-\input{related.tex}
+\input{conclusion.tex}
 \input{publications.tex}
 
 \bibliographystyle{abbrv}

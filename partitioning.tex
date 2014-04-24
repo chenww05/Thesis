@@ -1,4 +1,5 @@
 \chapter{Data Aware Workflow Partitioning}
+\label{chap:partitioning}
 
 When mapping data-intensive tasks to compute resources, scheduling mechanisms need to take into account not only the execution time of the tasks, but also the overheads of staging the dataset. This also applies to the task clustering problem since merging tasks usually means data transfers associated with these tasks have to be merged as well. In this chapter, we introduce our work on data aware workflow partitioning that divides large scale workflows into several sub-workflows that are fit for execution within a single execution site. Three widely used workflows have been used to evaluate the effectiveness of out methods and the experiments show an runtime improvement of up to 48.1\%. 
 
@@ -51,13 +52,13 @@ To efficiently partition workflows, we proposed a three-phase scheduling approac
 \end{figure}
 \begin{figure}[lh!]
 	\centering
-    \includegraphics[width=0.5\textwidth]{figures/partitioning/three_steps.pdf}
+    \includegraphics[width=0.7\textwidth]{figures/partitioning/three_steps.pdf}
     \caption{Three Steps of Search}
     \label{fig:three_steps}
 \end{figure}
 \begin{figure}[lh!]
 	\centering
-    \includegraphics[width=0.5\textwidth]{figures/partitioning/four_partitioning.pdf}
+    \includegraphics[width=0.9\textwidth]{figures/partitioning/four_partitioning.pdf}
     \caption{Four Partitioning Methods}
     \label{fig:four_partitioning}
 \end{figure}
@@ -253,4 +254,8 @@ Figure~\ref{fig:montage} depicts the performance of Montage with storage constra
 \textbf{Site selection}. To show the performance of site selection for each sub-workflow, we use three estimators and two schedulers  together with the CyberShake workflow. We build four execution sites with 4, 8, 10 and 10 Condor slots respectively. The labels in Figure~\ref{fig:scheduler} and Table~\ref{tab:scheduler} are defined in a way of ‘Estimator + Scheduler’. For example, HEFT+HEFT denotes a combination of HEFT estimator and HEFT scheduler, which performs best as we expected. The Average CPU Time (or ‘CPU’ in Figure 4.7) does not take the dependencies into consideration and the Critical Path (or ‘PATH’ in Figure~\ref{fig:scheduler}) does not consider the resource availability. The HEFT scheduler is slightly better than MinMin scheduler (or ‘MIN’ in Figure~\ref{fig:scheduler}). Although HEFT scheduler uses a global optimization algorithm compared to MinMin’s local optimization, the complexity of scheduling sub-workflows has been greatly reduced compared to scheduling a vast number of individual tasks. Therefore, both local and global optimization algorithms are able to handle such situations well.
 
 In conclusion, we provide a solution to address the problem of scheduling large workflows across multiple sites with storage constraints. The approach relies on partitioning the workflow into valid sub-workflows. Three heuristics are proposed and compared to show the close relationship between cross dependency and runtime improvement. The performance with three workflows shows that this approach is able to satisfy the storage constraints and reduce the makespan significantly especially for Epigenomics which has fewer fan-in (synchronization) jobs. For the workflows we used, scheduling them onto two or three execution sites is best due to a tradeoff between increased data transfer and increased parallelism. Site selection shows that the global optimization and local optimization perform almost the same.  
+
+\section{Summary}
+
+for other constraints
 
