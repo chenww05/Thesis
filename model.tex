@@ -1,33 +1,28 @@
-\chapter{Workflow and System Model}
+\chapter{Background}
 \label{chap:model}
 
-In this chapter, we first introduce how we extend the existing DAG model to be overhead aware and we also describe the system model that we use in this work. We then analyze the overhead characteristics and distributions across different distributed platforms. Finally we introduce a workflow simulator as an example of the importance of an overhead model when simulating workflow execution. The simulation of a widely used workflow verifies the necessity of taking overhead into consideration. In this chapter, we introduce our o-DAG model and present our overhead analysis on a series of widely used workflows, which is a base of our optimization methods that will be introduced in the rest of this thesis. 
-
-%Does not mention workflow model at all
-%Move task clustering to Balanced Clustering
-
-\section{Overhead aware DAG Model}
-
-Task clustering has been widely used in optimizing scientific workflows and can achieve significant improvement in the overall runtime performance \cite{Rynge2012, Singh2008, Li2011, Cao2008} of workflows. However,  there is a lack of a generic and systematic analysis and modeling of task clustering to improve the overall workflow performance including runtime, fault tolerance, data movement and resource utilization etc. To address this challenge, this work extends the existing Directed Acyclic Graph (DAG) model to be overhead aware (o-DAG), in which an overhead is also a node in the DAG and the control dependencies are added as directed edges. We utilize o-DAG to provide a systematic analysis of the performance of task clustering and provide a series of novel optimization methods to further improve the overall workflow performance. 
-
-
-
+In this chapter, we first introduce how we extend the existing DAG model to be overhead aware and we also describe the system model that we use in this thesis. Second we present our overhead analysis on a series of widely used workflows, which is a base of our optimization methods that will be used in simulations. Third, we introduce the experiment environments used in this thesis including FutureGrid, a distributed platform and a workflow simulator as an example of the importance of an overhead model when simulating workflow execution. The simulation of a widely used workflow verifies the necessity of taking overhead into consideration. 
+\section{Workflow and System Model}
 
 \begin{figure}[h!]
-\includegraphics[width=0.6\linewidth]{figures/introduction/odag.pdf}
+\includegraphics[width=0.3\linewidth]{figures/model/dag.pdf}
 \centering
-  \captionof{figure}{Extending DAG to o-DAG}
-  \label{fig:intro_odag}
+  \captionof{figure}{Simple DAG with four tasks ($t_1, t_2, t_3, t_4$). The edges represent data dependencies between tasks. }
+  \label{fig:model_dag}
 \end{figure}
 
-Traditionally a workflow is modeled as a Directed Acyclic Graph (DAG). Each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. A job ($j$) is a single execution unit and it contains one or multiple task(s). The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. In this work, we extend the DAG model to be overhead aware (o-DAG). The reason is that system overheads play an important role in workflow execution and they constitute a major part of the overall runtime when tasks are poorly clustered. Fig~\ref{fig:intro_odag} shows how we augment a DAG to be an o-DAG with the capability to represent scheduling overheads ($s$) such as workflow engine delay, queue delay, and postscript delay. The classification of overheads is based on the model of a typical workflow management system shown in Fig~\ref{fig:intro_system}. The components in this WMS are listed below: 
+Traditionally a workflow is modeled as a Directed Acyclic Graph (DAG). As shown in Figure~\ref{fig:model_dag}, each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. 
+%A job ($j$) is a single execution unit and it contains one or multiple task(s).
+ The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. 
+
+Workflows are typically prepared and executed in a Workflow Management System such as Pegasus \cite{Deelman2004}, ASKALON \cite{Ostermann2009b} and Taverna \cite{Calasanz2008}. The components of a WMS are listed below: 
 
 \begin{figure}[h!]
 \centering
-  \includegraphics[width=0.7\linewidth]{figures/introduction/model.pdf}
+  \includegraphics[width=0.7\linewidth]{figures/model/model.pdf}
 
   \caption{System Model}
-  \label{fig:intro_system}
+  \label{fig:model_system}
 \end{figure}
 
 \textbf{Workflow Mapper} generates an executable workflow based on an abstract workflow provided by the user or workflow composition system. 
@@ -35,6 +30,28 @@ Traditionally a workflow is modeled as a Directed Acyclic Graph (DAG). Each node
 \textbf{Job Scheduler} and \textbf{Local Queue} manage individual workflow jobs and supervise their execution on local and remote resources.
 \textbf{Job Wrapper} extracts tasks from clustered jobs and executes them at the worker nodes. 
 
+A DAG models the computational activities and data dependencies within a workflow and it fits with most workflow management systems such as Pegasus \cite{Deelman2004} and DAGMan \cite{Kalayci2010}. However, the preparation and execution of a scientific workflow in distributed environments often involves multiple components and the system overheads within and between these components are ignored. 
+An overhead is defined as the time of performing miscellaneous work other than executing the user’s computational activities. 
+To address this challenge, in this section, we extend the existing Directed Acyclic Graph (DAG) model to be overhead aware (o-DAG), in which an overhead is also a node in the DAG and the control dependencies are added as directed edges. We utilize o-DAG to provide a systematic analysis of the performance of workflow optimization methods and provide a series of novel optimization methods to further improve the overall workflow performance. 
+
+
+%????
+%Task clustering has been widely used in optimizing scientific workflows and can achieve significant improvement in the overall runtime performance \cite{Rynge2012, Singh2008, Li2011, Cao2008} of workflows. However,  there is a lack of a generic and systematic analysis and modeling of task clustering to improve the overall workflow performance including runtime, fault tolerance, data movement and resource utilization etc. 
+
+
+
+\begin{figure}[h!]
+\includegraphics[width=0.6\linewidth]{figures/model/odag.pdf}
+\centering
+  \captionof{figure}{Extending DAG to o-DAG}
+  \label{fig:model_odag}
+\end{figure}
+
+%In this work, we extend the DAG model to be overhead aware (o-DAG). The reason is that system overheads play an important role in workflow execution and they constitute a major part of the overall runtime when tasks are poorly clustered. 
+Fig~\ref{fig:model_odag} shows how we augment a DAG to be an o-DAG with the capability to represent scheduling overheads ($s$) such as workflow engine delay, queue delay, and postscript delay. The classification of overheads is based on the model of a typical workflow management system shown in Fig~\ref{fig:model_system}. 
+
+
+\section{Modeling Task Clustering}
 
 \begin{figure}[h!]
 \centering
@@ -64,14 +81,6 @@ After horizontal clustering, $t_2$ and $t_3$ in $j_1$ can be executed in sequenc
 
 
 Figure~\ref{fig:model_vc} illustrates an example of vertical clustering, in which tasks $t_2$, $t_4$, and $t_6$ are merged into $j_1$, while tasks $t_3$, $t_5$, and $t_7$ are merged into $j_2$. Similarly, clustering delays $c_2$ and $c_3$ are added to $j_1$ and $j_2$ respectively, but system overheads $s_4$, $s_5$, $s_6$, and $s_7$ are removed. 
-
-
-
-
-
-
-
-%Traditionally the optimization of workflow performance has been focusing on reducing overall runtime of computational activities through techniques such as  task scheduling that aims to adjust the mapping from tasks to resources. However, these approaches have over-simplified the characteristics of real distributed environments and under-estimated the complexity of large scale workflows. In practice, due to the distributed nature of these resources, the large number of tasks in a workflow, and the complex dependencies among the tasks, significant system overheads can occur during workflow execution. For example, a Montage workflow has around 10,000 tasks, which is a significant load for workflow management tools to schedule or maintain. On one hand, the duration of these tasks is usually around a few seconds, but the system overheads in distributed systems such as Grids can reach up to a few minutes. Merging these short workflow tasks into a larger group of tasks and executing them together can reduce the number of operations (such as job submission) and thus reduce the system overheads significantly. The process of merging tasks into a single job (group of tasks) is called task clustering. 
 
 
 
@@ -114,34 +123,9 @@ Figure~\ref{fig:model_vc} illustrates an example of vertical clustering, in whic
 
 
 
-%Traditionally a workflow is modeled as a Directed Acyclic Graph (DAG). Each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. Fig~\ref{fig:intro_odag} (left) shows a simple workflow with four tasks. A job ($j$) is a single execution unit and it contains one or multiple task(s). The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. 
-%In this paper, we extend the DAG model to be overhead aware (o-DAG). The reason is that system overheads play an important role in workflow execution and they constitute a major part of the overall runtime when tasks are poorly clustered. 
-%Fig~\ref{fig:intro_odag} (right) shows how we augment a DAG in Fig~\ref{fig:intro_odag} (left) to be an o-DAG with the capability to represent scheduling overheads ($s$) such as workflow engine delay ($w$), queue delay ($q$), and postscript delay ($q$). Fig~\ref{fig:intro_hc} further shows how we perform task clustering in this simple workflow, in which we merge $t_1$ and $t_2$ into a new job $j_4$. The scheduling overheads associated with $t_2$ and $t_3$ are removed and the overheads including the clustering delay ($c_1$) of $j_1$ are added. 
-
-%To execute this workflow, a workflow engine such as DAGMan \cite{DAGMan} processes this DAG starting from the root task ($t_0$) and then executes each task without violating the data dependencies. Take the example of one available resource, a possible schedule would be $t_0\rightarrow t_1\rightarrow t_2\rightarrow t_3$ or $t_0\rightarrow t_2\rightarrow t_1\rightarrow t_3$. Both of the two schedules satisfy the data dependencies are thereby they are correct. 
 
 
 
-
-
-
-The classification of overheads is based on the model of a typical workflow management system (WMS) shown in Fig~\ref{fig:intro_system}. The components in this WMS are listed below: 
-
-\textbf{Workflow Mapper} generates an executable workflow based on an abstract workflow provided by the user or a workflow composition system. 
-\textbf{Workflow Engine} executes the jobs in order of their dependencies. Only free jobs that have all their parent jobs completed are submitted to  Job Scheduler. 
-\textbf{Job Scheduler} and \textbf{Local Queue} manage individual workflow jobs and supervise their execution on local and remote resources.
-\textbf{Job Wrapper} extracts tasks from clustered jobs and executes them at the worker nodes. 
-
-
-
-
-
-%An overhead is defined as the time of performing miscellaneous work other than executing the user’s computational activities. 
-%The execution of scientific workflows often suffers from a variety of overheads in the distributed environment. 
-%Due to the distributed nature of these resources, the large number of tasks in a workflow, and the complex dependencies among the tasks, significant overheads can occur during the workflow execution. 
-%It is essential to identify the different overheads and to evaluate how different optimization methods reduce overheads and improve runtime performance. 
-%In this section, we present an overhead analysis for a set of workflows run on cloud, grid, or cluster platforms. 
-%We present the overhead distributions and the patterns that they have performed. 
 
 \section{Workflow Overheads}
 \subsection{Overhead Classification}
@@ -149,7 +133,7 @@ The classification of overheads is based on the model of a typical workflow mana
 
 \begin{figure}[h!]
 	\centering
-    \includegraphics[width=0.7\textwidth]{figures/model/overhead.pdf}
+    \includegraphics[width=0.7\textwidth]{figures/model/Job_Timeline.pdf}
     \caption{Workflow Events}
     \label{fig:model_overhead}
 \end{figure}
@@ -158,7 +142,7 @@ The classification of overheads is based on the model of a typical workflow mana
 The execution of a job is comprised of a series of events as shown in Figure~\ref{fig:model_overhead} and they are defined as:
 \begin{enumerate}\item Job Release is defined as the time when the workflow engine identifies that a job is ready to be submitted (when its parents have successfully completed). \item Job Submit is defined as the time when the workflow engine submits a job to the local queue. \item Job Execute is defined as the time when the workflow engine sees a job is being executed. 
 \item Task Execute is defined as the time when the job wrapper sees a task is being executed. \item Postscript Start is defined as the time when the workflow engine starts to execute a postscript. \item Postscript Terminate is defined as the time when the postscript returns a status code (success or failure). \end{enumerate}
-Figure~\ref{fig:model_overhead} shows a typical timeline of overheads and runtime in a compute job. We do not specify the data transfer delay in this timeline because data transfer is handled by data transfer jobs (stage-in and stage-out jobs). 
+Figure~\ref{fig:model_overhead} shows a typical timeline of overheads and runtime in a job. We do not specify the data transfer delay in this timeline because data transfer is handled by data transfer jobs (stage-in and stage-out jobs). 
 
 We have classified workflow overheads into five categories as follows. 
 \begin{enumerate}
@@ -168,153 +152,34 @@ The completion time of the last parent job means this job is released to the rea
 \item{Queue Delay} is defined as the time between the submission of a job by the workflow engine to the local queue and the time the local scheduler sees the job running. This overhead reflects the efficiency of the local workflow scheduler (e.g. Condor \cite{Frey2002}) to execute a job and the availability of resources for the execution of this job. 
 %The queue delay is an estimate of the time spent in the local queue on the submit host. 
 \item{Postscript Delay } is the time taken to execute a lightweight script under some execution systems after the execution of a job. Postscripts examine the status code of a job after the computational part of this job is done.
-%\item{Data Transfer Delay} happens when data is transferred between nodes. It includes three different types of processes: staging data in, cleaning up, and staging data out. Stage-in jobs transfer input files from source sites to execution sites before the computation starts. Cleanup jobs delete intermediate data that is no longer needed by the remainder of the workflow. Stage-out jobs transfer workflow output data to archiving sites for storage and analysis.
+\item{Data Transfer Delay} happens when data is transferred between nodes. It includes three different types of processes: staging data in, cleaning up, and staging data out. Stage-in jobs transfer input files from source sites to execution sites before the computation starts. Cleanup jobs delete intermediate data that is no longer needed by the remainder of the workflow. Stage-out jobs transfer workflow output data to archiving sites for storage and analysis.
 \item{Clustering Delay} measures the difference between the sum of the actual task runtime and the job runtime seen by the job wrapper. The cause of Clustering Delay is usually because we use a job wrapper in worker nodes to execute a clustered job that requires some delay to extract the list of tasks. 
 \end{enumerate}
 
 \subsection{Overhead Distribution}
 
-%We examined the overhead distributions of a wide range of workflows in our experiments . These workflows were run on distributed platforms including clouds, grids and dedicated clusters. 
-%%On clouds, virtual machines were provisioned and then the required services (such as file transfer services) were deployed. 
-%We examined two clouds: Amazon EC2 \cite{AmazonEC2}  and FutureGrid \cite{FutureGrid}. Amazon EC2 is a commercial, public cloud that is been widely used in distributed computing. 
-We examined the overhead distributions of a widely used astronomy workflow called Montage \cite{Berriman2004} that is used to construct large image mosaics of the sky. Montage was run on FutureGrid \cite{FutureGrid}. FutureGrid is a distributed, high-performance testbed that provides scientists with a set of computing resources to develop parallel, grid, and cloud applications. 
-%%On grids, grid resources were provisioned through Corral \cite{Juve2010a} and the required services were already installed before execution. A grid site may be a cluster system or a heterogeneous and dynamic collection of machines. In a dedicated cluster, Condor was used to schedule jobs directly to worker nodes. Part of this experimental data (especially those workflows run on Amazon EC2) has been studied in \cite{Juve2010c} but without a detailed overhead analysis. 
-%For the Amazon EC2 experiments, the performance with different numbers of resources and file system types is compared.%The workflows and execution environments we examined include:
-%\begin{enumerate}%%\item Epigenomics \cite{Epigenome} maps short DNA segments collected with high-throughput gene sequencing machines to a reference genome. It was run on Amazon EC2. 
-%%\item Proteomics \cite{Proteomics} is an application developed by scientists at Ohio State University and it is used for mass-spectrometry-based proteomics. It was run on Amazon EC2. 
-%\item Broadband \cite{Graves2008} is an application that enables researchers to combine long-period deterministic seismograms with high-frequency stochastic seismograms. It was run on Amazon EC2. 
-%\item Montage \cite{Berriman2004} is an astronomy application used to construct large image mosaics of the sky. The Montage workflows were run on FutureGrid.
-%\item CyberShake \cite{Graves2010, Callaghan2008, Deelman2006} is a seismology application that calculates Probabilistic Seismic Hazard curves for geographic sites in the Southern California region. It was run on the HPCC cluster \cite{HPCC} at the University of Southern California. 
-%\item SIPHT \cite{Livny2008} conducts searches for small untranslated RNAs (sRNAs) that are used to regulate essential biochemical processes in bacteria. It was run on a Condor cluster at the University of Wisconsin at Madison. 
-%\item LIGO \cite{Abramovici1992,LIGO} workflows are used to search for gravitational wave signatures in data collected by large-scale interferometers. We present one partition of the entire workflow in this work. It was run on a local cluster at the Syracuse University.
-%\end{enumerate}
-%
-%\begin{figure}[h!]
-%	\centering
-%    \includegraphics[width=0.4\textwidth]{figures/model/BB1.pdf}
-%\includegraphics[width=0.4\textwidth]{figures/model/BB2.pdf}
-%\includegraphics[width=0.4\textwidth]{figures/model/BB3.pdf}
-%\includegraphics[width=0.4\textwidth]{figures/model/BB4.pdf}
-%\includegraphics[width=0.4\textwidth]{figures/model/BB5.pdf}
-%    \caption{Frequency Distribution of Queue Delay in Broadband}
-%    \label{fig:model_broadband_distribution}
-%\end{figure}
-%
-%\begin{table}[h!]
-%\caption{Makespan of Broadband}
-%\label{tab:model_broadband}
-%\centering
-%\begin{tabular}{lrrrr}
-%\hline
-%     &      Makespan &     Num of Nodes &    File System  \\
-%\hline
-%BB1 & 1:08:17 & 8 & NFS\\
-%BB2 & 1:29:23 & 4 & NFS \\
-%BB3 & 1:32:57 & 4 & PVFS \\
-%BB4 & 1:51:14 & 1 & NFS \\
-%BB5 & 0:52:48 & 1 & shm \\
-%\hline
-%\end{tabular}
-%\end{table} 
-%
-%\begin{table}[h!]
-%\caption{the SSE (sum of squares of error) of different fitting distribution}
-%\label{tab:model_broadband_sse}
-%\centering
-%\begin{tabular}{lrrrr}
-%\hline
-%SSE(Unit: $10^4$)     &      Exponential &  Gamma & Normal & Weibull \\
-%\hline
-%BB1 & 3.57 & 232 & 8.69 & 235.2\\
-%BB2 & 2.33 & 244 & 5.59 & 181.0\\
-%BB3 & 1.97 & 73.9 & 4.18 & 52.4\\
-%BB4 & 3.31 & 340 & 7.22 & 251.7\\
-%BB5 & 2.84 & 73.1 & 6.48 & 55.4 \\
-%\hline
-%\end{tabular}
-%\end{table} 
-%
-%\begin{table}[h!]
-%\caption{the $\mu$ of the exponential fitting distribution}
-%\label{tab:model_broadband_mu}
-%\centering
-%\begin{tabular}{lrrrr}
-%\hline
-%(Unit: sec)     &      $\mu$ \\
-%\hline
-%BB1 & 944.85\\
-%BB2 & 1451.88\\
-%BB3 & 796.90\\
-%BB4 & 1952.71\\
-%BB5 & 892.16 \\
-%\hline
-%\end{tabular}
-%\end{table} 
-%
-%\begin{table}[h!]
-%\caption{the log likelihood of different fitting distribution}
-%\label{tab:model_broadband_log}
-%\centering
-%\begin{tabular}{lrrrr}
-%\hline
-%Log Likelihood     &      Exponential &  Gamma & Normal & Weibull \\
-%\hline
-%BB1 & -6045.3 & -5802.3 & -6464.1 & -5819.6\\
-%BB2 & -6376.1 & -6203.1 & -6707.9 & -6232.9\\
-%BB3 & -5914.2 & -5796.4 & -6181.4 & -5825.9\\
-%BB4 & -6376.1 & -6203.1 & -6707.9 & -6232.9\\
-%BB5 & -6001.1 & -5891.9 & -6327.9 & -5908.1 \\
-%\hline
-%\end{tabular}
-%\end{table} 
-%
-%Frequency distribution analysis serves as an important supplement to the understanding of how different execution environments influence the overheads. Figure~\ref{fig:model_broadband_distribution} presents the mean, median and the exponential fitting lines of Queue Delay in Broadband of five runs (BB1$\sim$BB5). The Broadband workflows were executed in environments with different number of worker nodes and file systems. These runs had the same jobs and used the same type of virtual machines (c1.xlarge), but they were run in different environments. The number of worker nodes was ranging from 1 to 8 and the file systems included NFS \cite{Sandberg1985}, PVFS \cite{Carns2000} and a shared memory system (shm) on a single host. 
-%
-%Comparing BB1, BB2 and BB4 we conclude that resource availability influences the distribution of the queue delay. Although for all the five runs, most of the queue delays (30\%$\sim$40\%) last less than 50 seconds, the maximum duration of queue delay increases with the decrease of resource availability. With more resources available, the local scheduler is able to find a resource for execution more quickly. BB3 is installed with PVFS, which performs worse than BB2 with NFS in this experiment. The shared memory system can also improve the performance, but it is limited to the case with only one host.  
-%
-%We use the Matlab Distribution Fitting tool \cite{Matlab} to analyze the distribution of the queue delay. This tool aims to maximize the log likelihood of the parameters. Table~\ref{tab:model_broadband_log} shows that the queue delay satisfies the Weibull and Gamma distribution better in terms of the log likelihood. However, Table~\ref{tab:model_broadband_sse} shows that in terms of SSE (sum of squares of error), the exponential and normal distributions perform better. For simplicity, we use an exponential distribution to describe the queue delay:
-%
-%\begin{equation} \label{eq:model_f1}
-% \phi_1(x)=\frac{1}{\mu}e^{-\frac{x}{\mu}}\varepsilon(x)
-%\end{equation}
-%
-%$\varepsilon(x)$ is an unit step function. The estimates of $\mu$ are listed in Table~\ref{tab:model_broadband_mu}. 
+We examined the overhead distributions of a widely used astronomy workflow called Montage \cite{Berriman2004} that is used to construct large image mosaics of the sky. Montage was run on FutureGrid \cite{Fox2013FutureGrid}. FutureGrid is a distributed, high-performance testbed that provides scientists with a set of computing resources to develop parallel, grid, and cloud applications. 
+Figure~\ref{fig:model_montage_queue_delay}, \ref{fig:model_montage_engine_delay} and \ref{fig:model_montage_postscript_delay} show the overhead distribution of the Montage workflow run on the FutureGrid. The postscript delay concentrates at 7 seconds, because the postscript is only used to locally check the return status of a job and is not influenced by the remote execution environment. The workflow engine delay tends to have a uniform distribution, which is because the workflow engine spends a constant amount of time to identify that the parent jobs have completed and insert a job that is ready at the end of the local queue. 
+The queue delay has three decreasing peak points at 8, 14, and 22 seconds. We believe this is because the average postscript delay is about 7 seconds (see details in Figure~\ref{fig:model_montage_queue_delay} ) and the average runtime is 1 second. The local scheduler spends about 8 seconds finding an available resource and executing a job; if there is no resource idle, it will wait another 8 seconds for the current running jobs to finish, and so on. 
 
-%Figure~\ref{fig:model_cybershake_distribution} shows the mean and standard deviation of all 78 partitions of the entire CyberShake workflow. The standard deviation is comparable to the mean of the overheads, which we attribute to the fact that HPCC comprises a diverse mix of computing and data resources and is shared among many users across the campus. Figure~\ref{fig:model_montage_queue_delay}, \ref{fig:model_montage_engine_delay} and \ref{fig:model_montage_postscript_delay} show the overhead distribution of the Montage workflow run on the FutureGrid. The postscript delay concentrates at 7 seconds, because the postscript is only used to locally check the return status of a job and is not influenced by the remote execution environment. The workflow engine delay tends to have a uniform distribution, which is because the workflow engine spends a constant amount of time to identify that the parent jobs have completed and insert a job that is ready at the end of the local queue. 
-%Normally, the queue delay has only one peak such as in Figure~\ref{fig:model_broadband_distribution}. But in this experiment, 
-The queue delay has three decreasing peak points at 8, 14, and 22 seconds. We believe this is because the average postscript delay is about 7 seconds (see details in Figure~\ref{fig:model_montage_queue_delay} ) and the average runtime is 1 second. The local scheduler spends about 8 seconds finding an available resource and executing a job; if there is no resource idle, it will wait another 8 seconds for the current running jobs to finish, and so on. %Based on Equation~\ref{eq:model_f1}, an integrated function of the queue delay can be expressed as a combination of multiple exponential distributions:
-%\begin{equation} \label{eq:model_f2}
-% \phi_2(x)=\sum_{i=1}^{\infty}e^{-ai}\phi_1(x-ib)
-%\end{equation}
-%$a$ is the attenuation coefficient of the exponential distribution and $b$ is the average distance between the peaks, namely the period. In the example of Figure~\ref{fig:model_montage_distribution}, $a\approx0.5, b\approx7$. 
-
-%\begin{figure}[h!]
-%	\centering
-%    \includegraphics[height=0.3\textwidth]{figures/model/cybershake_engine_delay.pdf}
-%\includegraphics[height=0.3\textwidth]{figures/model/cybershake_queue_delay.pdf}
-%\includegraphics[width=0.4\textwidth]{figures/model/cybershake_post_delay.pdf}
-%
-%    \caption{Mean and Variance of all the 78 partitions of the CyberShake workflow}
-%    \label{fig:model_cybershake_distribution}
-%\end{figure}
 
 \begin{figure}[h!]
 	\centering
-    \includegraphics[height=0.5\textwidth]{figures/model/workflow_engine_delay.eps}
+    \includegraphics[height=0.4\textwidth]{figures/model/workflow_engine_delay.eps}
     \caption{Distribution of Workflow Engine Delay in the Montage workflow}
     \label{fig:model_montage_engine_delay}
 \end{figure}
 
 \begin{figure}[h!]
 	\centering
-\includegraphics[height=0.5\textwidth]{figures/model/queue_delay.eps}
+\includegraphics[height=0.4\textwidth]{figures/model/queue_delay.eps}
     \caption{Distribution of Queue Delay in the Montage workflow}
     \label{fig:model_montage_queue_delay}
 \end{figure}
 
 \begin{figure}[h!]
 	\centering
-\includegraphics[width=0.9\textwidth]{figures/model/postscript_delay.eps}
+\includegraphics[width=0.7\textwidth]{figures/model/postscript_delay.eps}
     \caption{Distribution of Postscript Delay in the Montage workflow}
     \label{fig:model_montage_postscript_delay}
 \end{figure}
@@ -324,24 +189,21 @@ We use Workflow Engine Delay as an example to show the necessity to model overhe
 
 \begin{figure}[h!]
 	\centering
-    \includegraphics[width=0.7\textwidth]{figures/model/overhead_timeline2.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/model/overhead_timeline2.pdf}
     \caption{Workflow Overhead and Runtime. Clustering delay and data transfer delay are not shown}
     \label{fig:model_montage_timeline}
 \end{figure}
 
 
-
-
 \begin{figure}
-
 \centering
-  \includegraphics[width=0.9\linewidth]{figures/model/montage_one_run.eps}
+  \includegraphics[width=0.7\linewidth]{figures/model/montage_one_run.eps}
     \caption{Workflow Engine Delay of mProjectPP}
     \label{fig:model_montage_one_run}
 \end{figure}%
 \begin{figure}
   \centering
-  \includegraphics[width=0.9\linewidth]{figures/model/montage_clustering_delay.eps}
+  \includegraphics[width=0.7\linewidth]{figures/model/montage_clustering_delay.eps}
     \caption{Clustering Delay of mProjectPP, mDiffFit, and mBackground}
     \label{fig:model_montage_clustering}
 \end{figure}
@@ -350,10 +212,10 @@ We use Workflow Engine Delay as an example to show the necessity to model overhe
 
 
 
-Figure~\ref{fig:model_montage_clustering} shows the average value of Clustering Delay of mProjectPP, mDiffFit, and mBackground. It is clear that with the increase of $k$ (the maximum number of jobs per horizontal level), since there are less and less tasks in a clustered job, the Clustering Delay for each job decreases. For simplicity, we use an inverse proportional model in Equation~\ref{eq:model_clustering_delay} to describe this trend of Clustering Delay with $k$. Intuitively we assume that the average delay per task in a clustered job is constant ($n$ is the number of tasks in a horizontal level). An inverse proportional model can estimate the delay when $k=i$ directly if we have known the delay when $k=j$. Therefore we can predict all the clustering cases as long as we have gathered one clustering case. 
+Figure~\ref{fig:model_montage_clustering} shows the average value of Clustering Delay of mProjectPP, mDiffFit, and mBackground. It is clear that with the increase of $clusters.num$ (the maximum number of jobs per horizontal level), since there are less and less tasks in a clustered job, the Clustering Delay for each job decreases. For simplicity, we use an inverse proportional model in Equation~\ref{eq:model_clustering_delay} to describe this trend of Clustering Delay with $clusters.num$. Intuitively we assume that the average delay per task in a clustered job is constant ($n$ is the number of tasks in a horizontal level). An inverse proportional model can estimate the delay when $clusters.num=i$ directly if we have known the delay when $clusters.num=j$. Therefore we can predict all the clustering cases as long as we have gathered one clustering case. 
 
 \begin{equation} \label{eq:model_clustering_delay}
-\frac{Clustering Delay|_{k=i}}{Clustering Delay|_{k=j}}=\frac{n/i}{n/j}=\frac{j}{i}
+\frac{Clustering Delay|_{clusters.num=i}}{Clustering Delay|_{clusters.num=j}}=\frac{n/i}{n/j}=\frac{j}{i}
 \end{equation}
 
 

@@ -8,7 +8,7 @@ When mapping data-intensive tasks to compute resources, scheduling mechanisms ne
 
 Data movement between tasks in scientific workflows has received less attention compared to task execution. Often the staging of data between tasks is either assumed or the time delay in data transfer is considered to be negligible compared to task execution, which is not true in many cases, especially in data-intensive applications. In this chapter, we take the data transfer into consideration and propose to partition large workflows into several sub-workflows where each sub-workflows can be executed within one execution site. 
 
-The motivation behind workflow partitioning starts from a common scenario where a researcher at a research institution typically has access to several research clusters, each of which may consist of a small number of nodes. The nodes in one cluster may be very different from those in another cluster in terms of file system, execution environment, and security systems. For example, we have access to FutureGrid \cite{FutureGrid}, Teragrid/XSEDE \cite{TeraGrid}  and Amazon EC2 \cite{AmazonAWS} but each cluster imposes a limit on the resources, such as the maximum number of nodes a user can allocate at one time or the maximum storage. If these isolated clusters can work together, they collectively become more powerful.
+The motivation behind workflow partitioning starts from a common scenario where a researcher at a research institution typically has access to several research clusters, each of which may consist of a small number of nodes. The nodes in one cluster may be very different from those in another cluster in terms of file system, execution environment, and security systems. For example, we have access to FutureGrid \cite{Fox2013FutureGrid}, Teragrid/XSEDE \cite{TeraGrid}  and Amazon EC2 \cite{AmazonAWS} but each cluster imposes a limit on the resources, such as the maximum number of nodes a user can allocate at one time or the maximum storage. If these isolated clusters can work together, they collectively become more powerful.
 
 Additionally, the input dataset could be very large and widely distributed across multiple clusters. Data-intensive workflows require significant amount of storage and computation and therefore the storage system becomes a bottleneck. For these workflows, we need to use multiple execution sites and consider their available storage. For example, the entire CyberShake earthquake science workflow has 16,000 sub-workflows and each sub-workflow has more than 24,000 individual jobs and requires 58 GB of data. In this chapter, we assume we have Condor installed at the execution sites. A Condor pool can be either a physical cluster or a virtual cluster. 
 
@@ -135,10 +135,13 @@ In order to quickly deploy and reconfigure computational resources, we use a pri
 
 \begin{figure}[h!]
 	\centering
-    \includegraphics[width=0.9\textwidth]{figures/partitioning/heuristics.pdf}
+    \includegraphics[width=0.8\textwidth]{figures/partitioning/heuristics_usage.eps}
+\includegraphics[width=0.8\textwidth]{figures/partitioning/heuristics_makespan.eps}
     \caption{Performance of the three heuristics. The default workflow has one execution site with 4 VMs and 8 Condor slots and has no storage constraint.}
     \label{fig:heuristics}
 \end{figure}
+
+
 
 %\begin{figure}[h!]
 %	\centering
@@ -195,25 +198,30 @@ In order to quickly deploy and reconfigure computational resources, we use a pri
 %For example, Montage is I/O intensive, CyberShake is memory intensive, and Epigenomics is CPU intensive. The goal of the CyberShake Project \cite{Maechling2007} is to calculate Probabilistic Seismic Hazard curves for several geographic sites in the Southern California area. We ran one partition in our experiments that has 24,132 tasks and 58GB of overall data. Montage \cite{Berriman2004} is an astronomy application that is used to construct large image mosaics of the sky. We ran a Montage workflow with a size of 8 degree square of sky. The workflow has 10,422 tasks and 57GB of overall data. Epigenomics \cite{Epigenome} maps short DNA segments collected with high-throughput gene sequencing machines to a reference genome. The workflow has 1,586 tasks and 23GB of overall data. We ran each workflow instance 5 times to account for system variability. 
 
 
-%\begin{figure}[h!]
-%	\centering
-%    \includegraphics[width=0.3\textwidth]{figures/partitioning/montage.pdf}
-%\includegraphics[width=0.3\textwidth]{figures/partitioning/epigenomics.pdf}
-%    \caption{The Montage workflow and the Epigenomics workflow}
-%    \label{fig:workflow}
-%\end{figure}
 
 \begin{figure}[h!]
 	\centering
-    \includegraphics[width=0.9\textwidth]{figures/partitioning/cybershake.pdf}
+    \includegraphics[width=0.8\textwidth]{figures/partitioning/cybershake_usage.eps}
+ \includegraphics[width=0.8\textwidth]{figures/partitioning/cybershake_makespan.eps}
     \caption{Performance of the CyberShake workflow with different storage constraints}
     \label{fig:cybershake}
 \end{figure}
 
+
+
 \begin{figure}[h!]
 	\centering
-    \includegraphics[width=0.9\textwidth]{figures/partitioning/montage2.pdf}
+    \includegraphics[width=0.8\textwidth]{figures/partitioning/montage_usage.eps}
+    \includegraphics[width=0.8\textwidth]{figures/partitioning/montage_makespan.eps}
     \caption{Performance of the Montage workflow with different storage constraints}
+    \label{fig:montage}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+    \includegraphics[width=0.8\textwidth]{figures/partitioning/genome_usage.eps}
+    \includegraphics[width=0.8\textwidth]{figures/partitioning/genome_makespan.eps}
+    \caption{Performance of the Epigenomics workflow with different storage constraints}
     \label{fig:montage}
 \end{figure}
 
@@ -223,7 +231,7 @@ From now on, we only use Heuristic I in the partitioner in our experiments below
 
 \begin{figure}[h!]
 	\centering
-    \includegraphics[width=0.7\textwidth]{figures/partitioning/scheduler.pdf}
+    \includegraphics[width=0.9\textwidth]{figures/partitioning/estimator.eps}
     \caption{Performance of estimators and schedulers}
     \label{fig:scheduler}
 \end{figure}
