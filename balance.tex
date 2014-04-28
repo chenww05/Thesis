@@ -1,7 +1,7 @@
 \chapter{Balanced Clustering} 
 \label{chap:balance}
 In a scientific workflow, tasks within a level (or depth within a workflow directed acyclic graph) may have different runtimes. Merging tasks within a level without considering the runtime variance may cause load imbalance, i.e., some clustered jobs may be composed of short running tasks while others of long running tasks. This imbalance delays the release of tasks from the next level of the workflow, penalizing the workflow execution with an overhead produced by the use of inappropriate task clustering strategies.
-In this chapter, we examine the reasons that cause load imbalance in task clustering. Furthermore, we propose a series of task balancing methods to address these imbalance problems. A trace-based simulation shows our methods can significantly improve the runtime performance (the speedup is up to 1.4) of a widely used physics workflow compared to the naive implementation of task clustering.
+In this chapter, we examine the reasons that cause load imbalance in task clustering. Furthermore, we propose a series of task balancing methods to address these imbalance problems. A trace-based simulation shows our methods can significantly improve the runtime performance of five widely used workflows compared to the naive implementation of task clustering.
 
 \section{Motivation}
 
@@ -25,7 +25,7 @@ We generalize these two challenges (Runtime Imbalance and Dependency Imbalance) 
 In particular, we provide a novel approach to capture these metrics. Traditionally, there are two approaches to improve the performance of task clustering. The first one is a top-down approach \cite{Integration2012} that represents the clustering problem as a global optimization problem and aims to minimize the overall runtime of a workflow. However, the complexity of solving such an optimization problem does not scale well. The second one is a bottom-up approach \cite{Muthuvelu2005}\cite{Liu2009} that only examines free tasks to be merged and optimizes the clustering results locally. In contrast, our work extends these solutions to consider the neighboring tasks including siblings, parents, children and so on because such a family of tasks has strong connections between them. 
 
 %The third contribution we make is that we analyze and connect the performance of these metrics and balancing methods. These quantitative metrics indicate which type of imbalance problem a workflow is more likely to suffer from. Comparing the relative values of these metrics informs the selection of a balancing method or a combination of these methods. 
-In this chapter, we extend the previous work by studying (\emph{i}) the performance gain of using our balancing methods over a baseline execution on a larger set of workflows; (\emph{ii}) the performance gain over two additional task clustering methods in literature; (\emph{iii}) the performance impact of the variation of the average data size and number of resources; and (\emph{iv}) the performance impact of combining our balancing methods with vertical clustering.
+In this chapter, we address the balancing problem by studying (\emph{i}) the performance gain of using our balancing methods over a baseline execution on a larger set of workflows; (\emph{ii}) the performance gain over two additional task clustering methods in literature; (\emph{iii}) the performance impact of the variation of the average data size and number of resources; and (\emph{iv}) the performance impact of combining our balancing methods with vertical clustering.
 
 
 
@@ -33,7 +33,7 @@ In this chapter, we extend the previous work by studying (\emph{i}) the performa
 \section{Approach}
 
 
-Task clustering has been widely used to address the low performance of very short running tasks on platforms where the system overhead is high, such as distributed computing infrastructures. However, up to now, techniques do not consider the load balance problem. In particular, merging tasks within a workflow level without considering the runtime variance may cause load imbalance (Runtime Imbalance), or merging tasks without considering their data dependencies may lead to data locality problems (Dependency Imbalance). In this section, we introduce metrics that quantitatively capture workflow characteristics to measure runtime and dependence imbalances. We then present methods to handle the load balance problem.
+ In this section, we introduce metrics that quantitatively capture workflow characteristics to measure runtime and dependence imbalances. We then present methods to address the load balance problem.
 
 
 
@@ -43,7 +43,7 @@ Task clustering has been widely used to address the low performance of very shor
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.95\linewidth]{figures/balance/figure5.pdf}
+	\includegraphics[width=0.8\linewidth]{figures/balance/figure5.pdf}
 	\captionof{figure}{An example of Horizontal Runtime Variance.}
 	\label{fig:imbalance_rv}
 \end{figure}
@@ -53,7 +53,7 @@ Task clustering has been widely used to address the low performance of very shor
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.95\linewidth]{figures/balance/figure6.pdf}
+	\includegraphics[width=0.8\linewidth]{figures/balance/figure6.pdf}
 	\captionof{figure}{An example of Dependency Imbalance.}
 	\label{fig:imbalance_dv}
 \end{figure}
@@ -81,12 +81,12 @@ Thus, IFV($t_1$, $t_2$, $t_3$, $t_4$) = 0. In contrast, the $IF$ for $t_{1'}$, $
 	&IF(t_{2'})=IF(t_{3'})=IF(t_{4'})=IF(t_{6'})/3=0.17 \nonumber
 \end{eqnarray*}
 
-Therefore, the $IFV$ value for {$t_{1'}$, $t_{2'}$, $t_{3'}$, $t_{4'}$} is 0.17, which predicts it is likely to be less symmetric than the workflow in Figure~\ref{fig:imbalance_hifv} (left). In this paper, we use \textbf{HIFV} (Horizontal IFV) to indicate the $IFV$ of tasks at the same horizontal level. The time complexity of calculating the $IF$ of all the tasks of a workflow with $n$ tasks is $O(n)$.  
+Therefore, the $IFV$ value for {$t_{1'}$, $t_{2'}$, $t_{3'}$, $t_{4'}$} is 0.17, which predicts it is likely to be less symmetric than the workflow in Figure~\ref{fig:imbalance_hifv} (left). In this chapter, we use \textbf{HIFV} (Horizontal IFV) to indicate the $IFV$ of tasks at the same horizontal level. The time complexity of calculating the $IF$ of all the tasks of a workflow with $n$ tasks is $O(n)$.  
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.85\linewidth]{figures/balance/figure7.pdf}
-	\captionof{figure}{Example of workflows with different data dependencies (For better visualization, we do not show system overheads in the rest of the paper).}
+	\includegraphics[width=0.75\linewidth]{figures/balance/figure7.pdf}
+	\captionof{figure}{Example of workflows with different data dependencies}
 	\label{fig:imbalance_hifv}
 \end{figure}
 
@@ -165,7 +165,7 @@ For simplicity, system overheads are not displayed.
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.85\linewidth]{figures/balance/figure8.pdf}
+	\includegraphics[width=0.7\linewidth]{figures/balance/figure8.pdf}
 	\caption{An example of the HRB (Horizontal Runtime Balancing) method. By solely addressing runtime variance, data locality problems may arise.}
 	\label{fig:imbalance_hrb}
 \end{figure}
@@ -250,7 +250,7 @@ For example, in Figure~\ref{fig:imbalance_hifb}, $t_1$ and $t_2$ have $IF = 0.25
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=\linewidth]{figures/balance/figure9.pdf}
+	\includegraphics[width=0.75\linewidth]{figures/balance/figure9.pdf}
 	\captionof{figure}{An example of the HIFB (Horizontal Impact Factor Balancing) method. Impact factors allow the detection of similarities between tasks.}
 	\label{fig:imbalance_hifb}
 \end{figure}
@@ -261,21 +261,21 @@ For instance, in Figure~\ref{fig:imbalance_hdb}, the distances between tasks $D(
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.85\linewidth]{figures/balance/figure10.pdf}
+	\includegraphics[width=0.7\linewidth]{figures/balance/figure10.pdf}
 	\captionof{figure}{An example of the HDB (Horizontal Distance Balancing) method. Measuring the distances between tasks avoids data locality problems.}
 	\label{fig:imbalance_hdb}
 \end{figure}
 
-There are cases where HDB would yield lower performance than HIFB. For instance, let $t_1$, $t_2$, $t_3$, $t_4$, and $t_5$ be the set of tasks to be merged in the workflow presented in Figure~\ref{fig:imbalance_hifb_hdb}. HDB does not identify the difference in the number of parent/child tasks between the tasks, since $d(t_u,t_v) = 2, \forall u,v \in [1,5], u \neq v$. On the other hand, HIFB does distinguish them since their impact factors are slightly different. Example of such scientific workflows include the LIGO Inspiral workflow~\cite{LIGO}, which is used in the evaluation of this paper (Section~\ref{sec:balance:results}).
+There are cases where HDB would yield lower performance than HIFB. For instance, let $t_1$, $t_2$, $t_3$, $t_4$, and $t_5$ be the set of tasks to be merged in the workflow presented in Figure~\ref{fig:imbalance_hifb_hdb}. HDB does not identify the difference in the number of parent/child tasks between the tasks, since $d(t_u,t_v) = 2, \forall u,v \in [1,5], u \neq v$. On the other hand, HIFB does distinguish them since their impact factors are slightly different. Example of such scientific workflows include the LIGO Inspiral workflow~\cite{LIGO}, which is used in the evaluation of this chapter (Section~\ref{sec:balance:results}).
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.85\linewidth]{figures/balance/figure11.pdf}
+	\includegraphics[width=0.75\linewidth]{figures/balance/figure11.pdf}
 	\captionof{figure}{A workflow example where HDB yields lower performance than HIFB. HDB does not capture the difference in the number of parents/child tasks, since the distances between tasks ($t_1$, $t_2$, $t_3$, $t_4$, and $t_5$) are the same.}
 	\label{fig:imbalance_hifb_hdb}
 \end{figure}
 
-Table~\ref{tab:2} summarizes the imbalance metrics and balancing methods presented in this paper. 
+Table~\ref{tab:2} summarizes the imbalance metrics and balancing methods presented in this chapter. 
 
 \begin{figure}[htb]
 	\centering
@@ -315,7 +315,7 @@ In this method, vertical clustering is performed first, and then the balancing m
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.85\linewidth]{figures/balance/figure12.pdf}
+	\includegraphics[width=0.75\linewidth]{figures/balance/figure12.pdf}
 	\captionof{figure}{\emph{VC-prior}: vertical clustering is performed first, and then the balancing methods.}
 	\label{fig:imbalance_vc_prior}
 \end{figure}
@@ -325,7 +325,7 @@ In this method, vertical clustering is performed first, and then the balancing m
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=0.85\linewidth]{figures/balance/figure13.pdf}
+	\includegraphics[width=0.75\linewidth]{figures/balance/figure13.pdf}
 	\captionof{figure}{\emph{VC-posterior}: horizontal clustering (balancing methods) is performed first, and then vertical clustering (but without changes).}
 	\label{fig:imbalance_vc_posterior}
 \end{figure}
@@ -347,86 +347,6 @@ Here, balancing methods are first applied, and then vertical clustering. Figure~
 \label{sec:balance:experiments}
 
 The experiments presented hereafter evaluate the performance of our balancing methods when compared to an existing and effective task clustering strategy named Horizontal Clustering (HC)~\cite{Singh2008}, which is widely used by workflow management systems such as Pegasus~\cite{Deelman2004}. We also compare our methods with two heuristics described in literature: DFJS~\cite{Muthuvelu2005}, and AFJS~\cite{Liu2009}. DFJS groups bags of tasks based on the task durations up to the resource capacity. AFJS is an extended version of DFJS that is an adaptive fine-grained job scheduling algorithm to group fine-grained tasks according to processing capacity of the current available resources and bandwidth between these resources.
-
-% Workflow applications
-\subsection{Scientific workflow applications}
-\label{sec:balance:applications}
-
-Five real scientific workflow applications are used in the experiments: LIGO Inspiral analysis~\cite{LIGO}, Montage~\cite{Berriman2004}, CyberShake~\cite{Graves2010}, Epigenomics~\cite{Epigenome}, and SIPHT~\cite{SIPHT}. In this subsection, we describe each workflow application and present their main characteristics and structures.
-
-\paragraph{\textbf{LIGO}}
-Laser Interferometer Gravitational Wave Observatory (LIGO)~\cite{LIGO} workflows are used to search for gravitational wave signatures in data collected by large-scale interferometers. The observatories' mission is to detect and measure gravitational waves predicted by general relativity (Einstein's theory of gravity), in which gravity is described as due to the curvature of the fabric of time and space. The LIGO Inspiral workflow is a data-intensive workflow. Figure~\ref{fig:evaluation_shape_ligo} shows a simplified version of this workflow. The LIGO Inspiral workflow is separated into multiple groups of interconnected tasks, which we call branches in the rest of our paper. However, each branch may have a different number of pipelines as shown in Figure~\ref{fig:evaluation_shape_ligo}. 
-
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=0.6\linewidth]{figures/balance/figure14.pdf} \\
-	\caption{A simplified visualization of the LIGO Inspiral workflow.}
-	\label{fig:evaluation_shape_ligo}
-\end{figure}
-
-\paragraph{\textbf{Montage}}
-Montage~\cite{Berriman2004} is an astronomy application that is used to construct large image mosaics of the sky. Input images are reprojected onto a sphere and overlap is calculated for each input image. The application re-projects input images to the correct orientation while keeping background emission level constant in all images. The images are added by rectifying them to a common flux scale and background level. Finally the reprojected images are co-added into a final mosaic. The resulting mosaic image can provide a much deeper and detailed understanding of the portion of the sky in question. Figure~\ref{fig:evaluation_shape_montage} illustrates a small Montage workflow. The size of the workflow depends on the number of images used in constructing the desired mosaic of the sky. The structure of the workflow changes to accommodate increases in the number of inputs, which corresponds to an increase in the number of computational tasks.
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=0.55\linewidth]{figures/balance/figure15.pdf} \\
-	\caption{A simplified visualization of the Montage workflow.}
-	\label{fig:evaluation_shape_montage}
-\end{figure}
-
-\paragraph{\textbf{Cybershake}}
-CyberShake~\cite{Graves2010} is a seismology application that calculates Probabilistic Seismic Hazard curves for geographic sites in the Southern California region. It identifies all ruptures within 200km of the site of interest and converts rupture definition into multiple rupture variations with differing hypocenter locations and slip distributions. It then calculates synthetic seismograms for each rupture variance, and peak intensity measures are then extracted from these synthetics and combined with the original rupture probabilities to produce probabilistic seismic hazard curves for the site. Figure~\ref{fig:evaluation_shape_cybershake} shows an illustration of the Cybershake workflow.
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/balance/figure16.pdf} \\
-	\caption{A simplified visualization of the CyberShake workflow.}
-	\label{fig:evaluation_shape_cybershake}
-\end{figure}
-
-\paragraph{\textbf{Epigenomics}}
-The Epigenomics workflow~\cite{Epigenome} is a data-parallel workflow. Initial data are acquired from the Illumina-Solexa Genetic Analyzer in the form of DNA sequence lanes. Each Solexa machine can generate multiple lanes of DNA sequences. These data are converted into a format that can be used by sequence mapping software. The mapping software can do one of two major tasks. It either maps short DNA reads from the sequence data onto a reference genome, or it takes all the short reads, treats them as small pieces in a puzzle and then tries to assemble an entire genome. In our experiments, the workflow maps DNA sequences to the correct locations in a reference Genome. This generates a map that displays the sequence density showing how many times a certain sequence expresses itself on a particular location on the reference genome. Epigenomics is a CPU-intensive application and its simplified structure is shown in Figure~\ref{fig:evaluation_shape_genome}. Different to the LIGO Inspiral workflow, each branch in Epigenomics has exactly the same number of pipelines, which makes it more symmetric. 
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=\linewidth]{figures/balance/figure17.pdf} \\
-	\caption{A simplified visualization of the Epigenomics workflow with multiple branches.}
-	\label{fig:evaluation_shape_genome}
-\end{figure}
-
-\paragraph{\textbf{SIPHT}}
-The SIPHT workflow~\cite{SIPHT} conducts a wide search for small untranslated RNAs (sRNAs) that regulates several processes such as secretion or virulence in bacteria. The kingdom-wide prediction and annotation of sRNA encoding genes involves a variety of individual programs that are executed in the proper order using Pegasus~\cite{Deelman2004}. These involve the prediction of $\rho$-independent transcriptional terminators, BLAST (Basic Local Alignment Search Tools~\cite{SIPHT}) comparisons of the inter genetic regions of different replicons and the annotations of any sRNAs that are found. A simplified structure of the SIPHT workflow is shown in Figure~\ref{fig:evaluation_shape_sipht}. 
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/balance/figure18.pdf} \\
-	\caption{A simplified visualization of the SIPHT workflow.}
-	\label{fig:evaluation_shape_sipht}
-\end{figure}
-
-
-\begin{table}[!htb]
-	\setlength{\tabcolsep}{11pt}
-	\centering
-	\small
-	\begin{tabular}{lrrrr}
-		\hline
-		 & \multicolumn{1}{c}{Number} & \multicolumn{1}{c}{Average} &  \multicolumn{1}{c}{Average} \\
-		Workflow	& of Tasks	 & Data Size & Task Runtime \\
-		\hline
-		LIGO 		&800		& 5 MB	& 228s\\
-		Montage 		&300		&3 MB	&11s\\
-		CyberShake 	&700		&148 MB 	& 23s\\
-		Epigenomics 	&165 	& 355 MB	& 2952s\\
-		SIPHT		&1000	& 360 KB 	& 180s\\
-		\hline
-	\end{tabular}
-	\caption{Summary of the scientific workflows characteristics.}
-	\label{tab:evaluation_workflows}
-\end{table} 
-
-Table~\ref{tab:evaluation_workflows} shows the summary of the main \textbf{workflows characteristics}: number of tasks, average data size, and average task runtimes for the five workflows. 
-
 
 % Task clustering techniques
 \subsection{Task clustering techniques}
@@ -530,7 +450,7 @@ The adaptive fine-grained job scheduler (AFJS)~\cite{Liu2009} is an extension of
 
 DFJS and AFJS require parameter tuning (e.g. maximum runtime per clustered job) to efficiently cluster tasks into coarse-grained jobs. For instance, if the maximum runtime is too high, all tasks may be grouped into a single job, leading to loss of parallelism. In contrast, if the runtime threshold is too low, the algorithms do not group tasks, leading to no improvement over a baseline execution. 
 
-For comparison purposes, we perform a parameter study in order to tune the algorithms for each workflow application described in Section~\ref{sec:balance:applications}. Exploring all possible parameter combinations is a cumbersome and exhaustive task. In the original DFJS and AFJS works, these parameters are empirically chosen, however this approach requires deep knowledge about the workflow applications. Instead, we performed a parameter tuning study, where we first estimate the upper bound of \emph{max.runtime} ($n$) as the sum of all task runtimes, and the lower bound of \emph{max.runtime} ($m$) as 1 second for simplicity. Data points are divided into ten chunks and then we sample one data point from each chunk. We then select the chunk that has the lowest makespan and set $n$ and $m$ as the upper and lower bounds of the selected chunk, respectively. These steps are repeated until $n$ and $m$ have converged into a data point.
+For comparison purposes, we perform a parameter study in order to tune the algorithms for each workflow application described in Section~\ref{sec:applications}. Exploring all possible parameter combinations is a cumbersome and exhaustive task. In the original DFJS and AFJS works, these parameters are empirically chosen, however this approach requires deep knowledge about the workflow applications. Instead, we performed a parameter tuning study, where we first estimate the upper bound of \emph{max.runtime} ($n$) as the sum of all task runtimes, and the lower bound of \emph{max.runtime} ($m$) as 1 second for simplicity. Data points are divided into ten chunks and then we sample one data point from each chunk. We then select the chunk that has the lowest makespan and set $n$ and $m$ as the upper and lower bounds of the selected chunk, respectively. These steps are repeated until $n$ and $m$ have converged into a data point.
 
 %We do not provide a mathematical proof of the correctness of our method, since we are not focused on demonstrating the optimal tuning for DFJS and AFJS algorithms, but a rough estimation of the minimal makespan. Instead, 
 
@@ -538,26 +458,25 @@ To demonstrate the correctness of our sampling approach in practice, we show the
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=.9\linewidth]{figures/balance/figure19.eps}
+	\includegraphics[width=.6\linewidth]{figures/balance/figure19.eps}
 	\captionof{figure}{Relationship between the makespan of workflow and the specified maximum runtime in DFJS (Montage).}
 	\label{fig:evaluation_dfjs_montage}
 \end{figure}
 
-For simplicity, in the rest of this paper we use DFJS* and AFJS* to indicate the best estimated performance of DFJS and AFJS respectively using the sampling approach described above.
+For simplicity, in the rest of this chapter we use DFJS* and AFJS* to indicate the best estimated performance of DFJS and AFJS respectively using the sampling approach described above.
 
 
 % Experiment conditions
 \subsection{Experiment conditions}
 \label{sec:balance:experiment_conditions}
-We adopt a trace-based simulation approach, where we extended our WorkflowSim~\cite{WorkflowSim} simulator with the balanced clustering methods and imbalance metrics to simulate a controlled distributed environment. WorkflowSim is a workflow simulator that extends CloudSim~\cite{Calheiros2011} by providing support for task clustering, task scheduling, and resource provisioning at the workflow level. It has been recently used in multiple workflow study areas~\cite{WorkflowSim,Chen2012, jrad2013broker} and its correctness has been verified in~\cite{WorkflowSim}. 
+We adopt a trace-based simulation approach, where we extended our WorkflowSim~\cite{WorkflowSim} simulator with the balanced clustering methods and imbalance metrics to simulate a controlled distributed environment. 
+The simulated computing platform is composed by 20 single homogeneous core virtual machines (worker nodes), which is the quota per user of some typical distributed environments such as Amazon EC2~\cite{AmazonAWS} and FutureGrid~\cite{Fox2013FutureGrid}. Each simulated virtual machine (VM) has 512MB of memory and the capacity to process 1,000 million instructions per second. The default network bandwidth is 15MB according to the real environment in FutureGrid from where our traces were collected. The task scheduling algorithm is data-aware, i.e. tasks are scheduled to resources which have the most input data available. By default, we merge tasks at the same horizontal level into 20 clustered jobs, which is a simple selection of granularity control of the strength of task clustering. The study of granularity size has been done in~\cite{Chen2013b}, which shows such selection is acceptable. 
 
-The simulated computing platform is composed by 20 single homogeneous core virtual machines (worker nodes), which is the quota per user of some typical distributed environments such as Amazon EC2~\cite{AmazonAWS} and FutureGrid~\cite{Fox2013FutureGrid}. Amazon EC2 is a commercial, public cloud that has been widely used in distributed computing, in particular for scientific workflows~\cite{Berriman2010}. FutureGrid is a distributed, high-performance testbed that provides scientists with a set of computing resources to develop parallel, grid, and cloud applications. Each simulated virtual machine (VM) has 512MB of memory and the capacity to process 1,000 million instructions per second. The default network bandwidth is 15MB according to the real environment in FutureGrid from where our traces were collected. The task scheduling algorithm is data-aware, i.e. tasks are scheduled to resources which have the most input data available. By default, we merge tasks at the same horizontal level into 20 clustered jobs, which is a simple selection of granularity control of the strength of task clustering. The study of granularity size has been done in~\cite{Chen2013b}, which shows such selection is acceptable. 
-
-We collected workflow execution traces~\cite{Juve2013,Chen2011} (including overhead and task runtime information) from real runs (executed on FutureGrid and Amazon EC2) of the scientific workflow applications described in Section~\ref{sec:balance:applications}. The traces are used to feed the Workflow Generator toolkit~\cite{WorkflowGenerator} to generate synthetic workflows. This allows us to perform simulations with several different configurations under controlled conditions. The toolkit uses the information gathered from actual scientific workflow executions to generate synthetic workflows resembling those used by real world scientific applications. The number of inputs to be processed, the number of tasks in the workflow, and their composition determine the structure of the generated workflow. Such an approach of traced based simulation allows us to utilize real traces and vary the system setting (i.e., the number of VMs) and workflow (i.e., avg. data size) to fully explore the performance of our balancing algorithms. 
+We collected workflow execution traces~\cite{Juve2013,Chen2011} (including overhead and task runtime information) from real runs (executed on FutureGrid and Amazon EC2) of the scientific workflow applications described in Section~\ref{sec:applications}. The traces are used to feed the Workflow Generator toolkit~\cite{WorkflowGenerator} to generate synthetic workflows. This allows us to perform simulations with several different configurations under controlled conditions. The toolkit uses the information gathered from actual scientific workflow executions to generate synthetic workflows resembling those used by real world scientific applications. The number of inputs to be processed, the number of tasks in the workflow, and their composition determine the structure of the generated workflow. Such an approach of traced based simulation allows us to utilize real traces and vary the system setting (i.e., the number of VMs) and workflow (i.e., avg. data size) to fully explore the performance of our balancing algorithms. 
 
 Three sets of experiments are conducted. Experiment 1 evaluates the performance gain ($\mu$) of our balancing methods (HRB, HIFB, and HDB) over a baseline execution that has no task clustering. We define the performance gain over a baseline execution ($\mu$) as the performance of the balancing methods related to the performance of an execution without clustering. Thus, for values of $\mu > 0$ our balancing methods perform better than the baseline execution. Otherwise, the balancing methods perform poorer. The goal of the experiment is to identify conditions where each method works best and worst. In addition, we also evaluate the performance gain of using workflow structure metrics (HRV, HIFV, and HDV), which require fewer \emph{a-priori} knowledge from task and resource characteristics, over task clustering techniques in literature (HC, DFJS*, and AFJS*).
 
-Experiment 2 evaluates the performance impact of the variation of average data size (defined as the average of all the input and output data) and the number of resources available in our balancing methods for one scientific workflow application (LIGO). The original average data size (both input and output data) of the LIGO workflow is about 5MB as shown in Table~\ref{tab:evaluation_workflows}. In this experiment, we increase the average data size up to 500MB to study the behavior of data intensive workflows. We control resource contention by varying the number of available resources (VMs). High resource contention is achieved by setting the number of available VMs to 5, which represents less than 10\% of the required resources to compute all tasks in parallel. On the other hand, low contention is achieved when the number of available VMs is increased to 25, which represents about 50\% of the required resources.
+Experiment 2 evaluates the performance impact of the variation of average data size (defined as the average of all the input and output data) and the number of resources available in our balancing methods for one scientific workflow application (LIGO). The original average data size (both input and output data) of the LIGO workflow is about 5MB as shown in Table~\ref{tab:model_workflows}. In this experiment, we increase the average data size up to 500MB to study the behavior of data intensive workflows. We control resource contention by varying the number of available resources (VMs). High resource contention is achieved by setting the number of available VMs to 5, which represents less than 10\% of the required resources to compute all tasks in parallel. On the other hand, low contention is achieved when the number of available VMs is increased to 25, which represents about 50\% of the required resources.
 
 Experiment 3 evaluates the influence of combining our horizontal clustering methods with vertical clustering (VC). We compare the performance gain under four scenarios: (\emph{i}) \emph{VC-prior}, VC is first performed and then HRB, HIFB, or HDB; (\emph{ii}) \emph{VC-posterior}, horizontal methods are performed first and then VC; (\emph{iii}) \emph{No-VC}, horizontal methods only; and (\emph{iv}) \emph{VC-only}, no horizontal methods. Table~\ref{tab:evaluation_vc_combination} shows the results of combining VC with horizontal methods. For example, VC-HIFB indicates we perform VC first and then HIFB. 
 %The motivation behind this experiment is that we believe VC will change imbalance metrics (HIFV, HDV and HRV) and we aim to show how these metrics can help us understand the performance of VC better. 
@@ -589,11 +508,11 @@ Experiment 3 evaluates the influence of combining our horizontal clustering meth
 \paragraph{\textbf{Experiment 1}}
 Figure~\ref{fig:evaluation_algorithm} shows the performance gain $\mu$ of the balancing methods for the five workflow applications over a baseline execution. All clustering techniques significantly improve (up to 48\%) the runtime performance of all workflow applications, except HC for SIPHT. The reason is that SIPHT has a high HRV compared to other workflows as shown in Table~\ref{tab:evaluation_montage}. This indicates that the runtime imbalance problem in SIPHT is more significant and thus it is harder for HC to achieve performance improvement. Cybershake and Montage workflows have the highest gain but nearly the same performance independent of the algorithm. This is due to their symmetric structure and low values for the imbalance metrics and the distance metrics as shown in Table~\ref{tab:evaluation_montage}. 
 Epigenomics and LIGO have higher average task runtime and thus the lower performance gain. However, Epigenomices and LIGO have higher variance of runtime and distance and thus the performance improvement of HRB and HDB is better than that of HC, which is more significant compared to other workflows. 
-In particular, each branch of the Epigenomics workflow (Figure~\ref{fig:evaluation_shape_genome}) has the same number of pipelines, consequently the $IF$ values of tasks in the same horizontal level are the same. Therefore, HIFB cannot distinguish tasks from different branches, which leads the system to a dependency imbalance problem. In such cases, HDB captures the dependency between tasks and yields better performance. Furthermore, Epigenomics and LIGO workflows have high runtime variance, which has higher impact on the performance than data dependency. Last, the performance gain of our balancing methods is better than the tuned algorithms DFJS* and AFJS* in most cases. The other benefit is that our balancing methods do not require parameter tuning, which is cumbersome in practice. 
+In particular, each branch of the Epigenomics workflow (Figure~\ref{fig:model_shape_genome}) has the same number of pipelines, consequently the $IF$ values of tasks in the same horizontal level are the same. Therefore, HIFB cannot distinguish tasks from different branches, which leads the system to a dependency imbalance problem. In such cases, HDB captures the dependency between tasks and yields better performance. Furthermore, Epigenomics and LIGO workflows have high runtime variance, which has higher impact on the performance than data dependency. Last, the performance gain of our balancing methods is better than the tuned algorithms DFJS* and AFJS* in most cases. The other benefit is that our balancing methods do not require parameter tuning, which is cumbersome in practice. 
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=1.0\linewidth]{figures/balance/figure20.eps}
+	\includegraphics[width=0.8\linewidth]{figures/balance/figure20.eps}
 	\captionof{figure}{Experiment 1: performance gain ($\mu$) over a baseline execution for six algorithms (*~indicates the tuned performance of DFJS and AFJS). By default, we have 20 VMs. }
 	\label{fig:evaluation_algorithm}
 \end{figure}
@@ -660,12 +579,12 @@ In particular, each branch of the Epigenomics workflow (Figure~\ref{fig:evaluati
 
 \paragraph{\textbf{Experiment 2}} 
 Figure~\ref{fig:evaluation_datasize} shows the performance gain $\mu$ of HRB, HIFB, HDB, and HC over a baseline execution for the LIGO Inspiral workflow. We chose LIGO because the performance improvement among these balancing methods is significantly different for LIGO compared to other workflows as shown in Figure~\ref{fig:evaluation_algorithm}. For small data sizes (up to 100 MB), the application is CPU-intensive and runtime variations have higher impact on the performance of the application. Thus, HRB performs better than any other balancing method. When increasing the data average size, the application turns into a data-intensive application, i.e. data dependencies have higher impact on the application's performance. HIFB captures both the workflow structure and task runtime information, which reduces data transfers between tasks and consequently yields better performance gain over the baseline execution. HDB captures the strong connections between tasks (data dependencies), while HIFB captures the weak connections (similarity in terms of structure). In some cases, HIFV is zero while HDV is less likely to be zero.
-Most of the LIGO branches are like the ones in Figure~\ref{fig:evaluation_shape_ligo}, however, as mentioned in Section~\ref{sec:balance:methods}, the LIGO workflow has a few branches that depend on each other as shown in Figure~\ref{fig:imbalance_hifb_hdb}. Since most branches are isolated from each other, HDB initially performs well compared to HIFB. However, with the increase of average data size, the performance of HDB is more and more constrained by the interdependent branches, which is shown in Figure~\ref{fig:evaluation_datasize}.  
+Most of the LIGO branches are like the ones in Figure~\ref{fig:model_shape_ligo}, however, as mentioned in Section~\ref{sec:balance:methods}, the LIGO workflow has a few branches that depend on each other as shown in Figure~\ref{fig:imbalance_hifb_hdb}. Since most branches are isolated from each other, HDB initially performs well compared to HIFB. However, with the increase of average data size, the performance of HDB is more and more constrained by the interdependent branches, which is shown in Figure~\ref{fig:evaluation_datasize}.  
 HC has nearly constant performance despite of the average data size, due to its random merging of tasks at the same horizontal level regardless of the runtime and data dependency information.
 
 \begin{figure}[!htb]
 	\centering
-    \includegraphics[width=\linewidth]{figures/balance/figure21.eps}
+    \includegraphics[width=0.8\linewidth]{figures/balance/figure21.eps}
     \caption{Experiment 2: performance gain ($\mu$) over a baseline execution with different average data sizes for the LIGO workflow. The original avg. data size is 5MB.}
     \label{fig:evaluation_datasize}
 \end{figure}
@@ -674,41 +593,41 @@ Figures~\ref{fig:evaluation_resource_1} and~\ref{fig:evaluation_resource_2} show
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=1.0\linewidth]{figures/balance/figure22.eps}
+	\includegraphics[width=0.8\linewidth]{figures/balance/figure22.eps}
 	\captionof{figure}{Experiment 2: performance gain ($\mu$) over baseline execution with different number of resources for the LIGO workflow (average data size is 5MB).}
 	\label{fig:evaluation_resource_1}
 \end{figure}
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=1.0\linewidth]{figures/balance/figure23.eps}
+	\includegraphics[width=0.8\linewidth]{figures/balance/figure23.eps}
 	\captionof{figure}{Experiment 2: performance gain ($\mu$) over baseline execution with different number of resources for the LIGO workflow (average data size is 500MB).}
 	\label{fig:evaluation_resource_2}
 \end{figure}
 
 
 \paragraph{\textbf{Experiment 3}}
-Figure~\ref{fig:evaluation_vc_cybershake} shows the performance gain $\mu$ for the Cybershake workflow over the baseline execution when using vertical clustering (VC) combined to our balancing methods. Vertical clustering does not aggregate any improvement to the Cybershake workflow ($\mu$(\emph{VC-only}) $\approx 0.2\%$), because the workflow structure has no explicit pipeline (see Figure~\ref{fig:evaluation_shape_cybershake}). Similarly, VC does not improve the SIPHT workflow due to the lack of pipelines on its structure (Figure~\ref{fig:evaluation_shape_sipht}). Thus, results for this workflow are omitted.
+Figure~\ref{fig:evaluation_vc_cybershake} shows the performance gain $\mu$ for the Cybershake workflow over the baseline execution when using vertical clustering (VC) combined to our balancing methods. Vertical clustering does not aggregate any improvement to the Cybershake workflow ($\mu$(\emph{VC-only}) $\approx 0.2\%$), because the workflow structure has no explicit pipeline (see Figure~\ref{fig:model_shape_cybershake}). Similarly, VC does not improve the SIPHT workflow due to the lack of pipelines on its structure (Figure~\ref{fig:model_shape_sipht}). Thus, results for this workflow are omitted.
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=1.0\linewidth]{figures/balance/figure24.eps}
+	\includegraphics[width=0.8\linewidth]{figures/balance/figure24.eps}
 	\captionof{figure}{Experiment 3: performance gain ($\mu$) for the Cybershake workflow over baseline execution when using vertical clustering (VC).}
 	\label{fig:evaluation_vc_cybershake}
 \end{figure}
 
-Figure~\ref{fig:evaluation_vc_montage} shows the performance gain $\mu$ for the Montage workflow. In this workflow, vertical clustering is often performed on the two pipelines (Figure~\ref{fig:evaluation_shape_montage}). These pipelines are commonly single-task levels, thereby no horizontal clustering is performed on the pipelines. As a result, whether performing vertical clustering prior or after horizontal clustering, the result is about the same. Since VC and horizontal clustering methods are independent with each other in this case, we still should do VC in combination with horizontal clustering to achieve further performance improvement. 
+Figure~\ref{fig:evaluation_vc_montage} shows the performance gain $\mu$ for the Montage workflow. In this workflow, vertical clustering is often performed on the two pipelines (Figure~\ref{fig:model_shape_montage}). These pipelines are commonly single-task levels, thereby no horizontal clustering is performed on the pipelines. As a result, whether performing vertical clustering prior or after horizontal clustering, the result is about the same. Since VC and horizontal clustering methods are independent with each other in this case, we still should do VC in combination with horizontal clustering to achieve further performance improvement. 
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=1.0\linewidth]{figures/balance/figure25.eps}
+	\includegraphics[width=0.8\linewidth]{figures/balance/figure25.eps}
 	\captionof{figure}{Experiment 3: performance gain ($\mu$) for the Montage workflow over baseline execution when using vertical clustering (VC).}
 	\label{fig:evaluation_vc_montage}
 \end{figure}
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=1.0\linewidth]{figures/balance/figure26.eps}
+	\includegraphics[width=0.8\linewidth]{figures/balance/figure26.eps}
 	\captionof{figure}{Experiment 3: performance gain ($\mu$) for the LIGO workflow over baseline execution when using vertical clustering (VC).}
 	\label{fig:evaluation_vc_ligo}
 \end{figure}
@@ -716,18 +635,18 @@ Figure~\ref{fig:evaluation_vc_montage} shows the performance gain $\mu$ for the 
 
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[width=1.0\linewidth]{figures/balance/figure27.eps}
+	\includegraphics[width=0.8\linewidth]{figures/balance/figure27.eps}
 	\captionof{figure}{Experiment 3: performance gain ($\mu$) for the Epigenomics workflow over baseline execution when using vertical clustering (VC).}
 	\label{fig:evaluation_vc_genome}
 \end{figure}
 
-The performance gain $\mu$ for the LIGO workflow is shown in Figure~\ref{fig:evaluation_vc_ligo}. Vertical clustering yields better performance gain when it is performed prior to horizontal clustering (\emph{VC-prior}). The LIGO workflow structure (Figure~\ref{fig:evaluation_shape_ligo}) has several pipelines that when primarily clustered vertically reduce system overheads (e.g. queuing and scheduling times). Furthermore, the runtime variance (HRV) of the clustered pipelines increases, thus the balancing methods, in particular HRB, can further improve the runtime performance by evenly distributing task runtimes among clustered jobs. When vertical clustering is performed \emph{a posteriori}, pipelines are broken due to the horizontally merging of tasks between pipelines neutralizing vertical clustering improvements.
+The performance gain $\mu$ for the LIGO workflow is shown in Figure~\ref{fig:evaluation_vc_ligo}. Vertical clustering yields better performance gain when it is performed prior to horizontal clustering (\emph{VC-prior}). The LIGO workflow structure (Figure~\ref{fig:model_shape_ligo}) has several pipelines that when primarily clustered vertically reduce system overheads (e.g. queuing and scheduling times). Furthermore, the runtime variance (HRV) of the clustered pipelines increases, thus the balancing methods, in particular HRB, can further improve the runtime performance by evenly distributing task runtimes among clustered jobs. When vertical clustering is performed \emph{a posteriori}, pipelines are broken due to the horizontally merging of tasks between pipelines neutralizing vertical clustering improvements.
 
 
 
 
 
-Similarly to the LIGO workflow, the performance gain $\mu$ values for the Epigenomics workflow (see Figure~\ref{fig:evaluation_vc_genome}) are better when VC is performed \emph{a priori}. This is due to several pipelines inherent to the workflow structure (Figure~\ref{fig:evaluation_shape_genome}). However, vertical clustering has poorer performance if it is performed prior to the HDB algorithm. The reason is the average task runtime of Epigenomics is much larger than other workflows as shown in Table.~\ref{tab:evaluation_workflows}. Therefore, \emph{VC-prior} generates very large clustered jobs vertically and makes it difficult for horizontal methods to improve further. 
+Similarly to the LIGO workflow, the performance gain $\mu$ values for the Epigenomics workflow (see Figure~\ref{fig:evaluation_vc_genome}) are better when VC is performed \emph{a priori}. This is due to several pipelines inherent to the workflow structure (Figure~\ref{fig:model_shape_genome}). However, vertical clustering has poorer performance if it is performed prior to the HDB algorithm. The reason is the average task runtime of Epigenomics is much larger than other workflows as shown in Table.~\ref{tab:model_workflows}. Therefore, \emph{VC-prior} generates very large clustered jobs vertically and makes it difficult for horizontal methods to improve further. 
 
 
 In a word, these experiments show strong connections between the imbalance metrics and the performance improvement of the balancing methods we proposed. HRV indicates the potential performance improvement for HRB. The higher HRV is, the more performance improvement HRB is likely to have. Similarly, for symmetric workflows (such as Epigenomics), their HIFV and HDV values are low and thus neither HIFB or HDB performs well. 
@@ -743,16 +662,5 @@ Three experiment sets were conducted using traces from five real workflow applic
 
 The simulation based evaluation also shows that the performance improvement of the proposed balancing algorithms (HRB, HDB and HIFB) is highly related to the metric values (HRV, HDV and HIFV) that we introduced. For example, a workflow with high HRV tends to have better performance improvement with HRB since HRB is used to balance the runtime variance. 
 
-In the future, we plan to further analyze the imbalance metrics proposed. For instance, the values of these metrics presented in this paper are not normalized, and thus their values per level (HIFV, HDV, and HRV) are in different scales. Also, we plan to analyze more workflow applications, particularly the ones with asymmetric structures, to investigate the relationship between workflow structures and the metric values. 
-
-Also, as shown in Figure~\ref{fig:evaluation_vc_genome}, \emph{VC-prior} can generate very large clustered jobs vertically and makes it difficult for horizontal methods to improve further. Therefore, we aim to develop imbalance metrics for \emph{VC-prior} to avoid generating large clustered jobs, i.e., based on the accumulated runtime of tasks in a pipeline. 
-
-
-As shown in our experiment results, the combination of our balancing methods with vertical clustering have different sensitivity to workflows with distinguished graph structures and runtime distribution. Therefore, a possible future work is the development of a portfolio clustering, which chooses multiple clustering algorithms, and dynamically selects most suitable one according to the dynamic load.
-
-In this paper, we demonstrate the performance gain of combining horizontal clustering methods and vertical clustering. We plan to combine multiple algorithms together instead of just two. We will develop a policy engine that iteratively chooses one algorithm from all of the balancing methods based on the imbalance metrics until the performance gain converges. 
-
-Finally, we aim at applying our metrics to other workflow study areas, such as workflow scheduling where heuristics would either look into the characteristics of the task when it is ready to schedule (local scheduling), or examine the entire workflow (global optimization algorithms). In this work, the impact factor metric only uses a family of tasks that are tightly related or similar to each other. This method represents a new approach to solve the existing problems. 
-
-
+This chapter has provided a novel approach to address the problem of load imbalance in task clustering. However, the dynamic features of modern distributed systems have brought us new challenges. For example, task clustering strategies in a faulty environment may fail to maintain its performance. In next chapter, we will introduce our fault tolerant clustering to address this issue. 
 

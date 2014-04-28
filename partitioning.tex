@@ -1,7 +1,7 @@
 \chapter{Data Aware Workflow Partitioning}
 \label{chap:partitioning}
 
-When mapping data-intensive tasks to compute resources, scheduling mechanisms need to take into account not only the execution time of the tasks, but also the overheads of staging the dataset. This also applies to the task clustering problem since merging tasks usually means data transfers associated with these tasks have to be merged as well. In this chapter, we introduce our work on data aware workflow partitioning that divides large scale workflows into several sub-workflows that are fit for execution within a single execution site. Three widely used workflows have been used to evaluate the effectiveness of out methods and the experiments show an runtime improvement of up to 48.1\%. 
+In this chapter, we introduce our work on data aware workflow partitioning that divides large-scale workflows into several sub-workflows that are fit for execution within a single execution site. Three widely used workflows have been used to evaluate the effectiveness of out methods and the experiments show an runtime improvement of up to 48.1\%. 
 
 
 \section{Motivation}
@@ -12,7 +12,7 @@ The motivation behind workflow partitioning starts from a common scenario where 
 
 Additionally, the input dataset could be very large and widely distributed across multiple clusters. Data-intensive workflows require significant amount of storage and computation and therefore the storage system becomes a bottleneck. For these workflows, we need to use multiple execution sites and consider their available storage. For example, the entire CyberShake earthquake science workflow has 16,000 sub-workflows and each sub-workflow has more than 24,000 individual jobs and requires 58 GB of data. In this chapter, we assume we have Condor installed at the execution sites. A Condor pool can be either a physical cluster or a virtual cluster. 
 
-The first benefit of workflow partitioning is that this approach reduces the complexity of workflow mapping. For example, the entire CyberShake workflow has more than $3.8\times 10^8$ tasks, which is a significant load for workflow management tools to maintain or schedule. In contrast, each sub-workflow has 24,000 tasks, which is acceptable for workflow management tools. A sub-workflow is a workflow and also a job of a higher-level workflow. What is more, workflow partitioning provides a fine granularity adjustment of workflow activities so that each sub-workflow can be adequate for one execution site. In the end, workflow partitioning allows us to migrate or retry sub-workflows efficiently. The overall workflow can be partitioned into sub-workflows and each sub-workflow can to be executed in different execution environments such as a hybrid platform of Condor/DAGMan \cite{DAGMan} and MPI/DAGMan \cite{Rynge2012}) while the traditional task clustering technique requires all the tasks can be executed in the same execution environment. 
+The first benefit of workflow partitioning is that this approach reduces the complexity of workflow mapping. For example, the entire CyberShake workflow has more than $3.8\times 10^8$ tasks, which is a significant load for workflow management tools to maintain or schedule. In contrast, each sub-workflow has 24,000 tasks, which is acceptable for workflow management tools. A sub-workflow is a workflow and also a job of a higher-level workflow. What is more, workflow partitioning provides \textbf{a fine granularity adjustment of workflow activities} so that each sub-workflow can be adequate for one execution site. In the end, workflow partitioning allows us to migrate or retry sub-workflows efficiently. The overall workflow can be partitioned into sub-workflows and each sub-workflow can to be executed in different execution environments such as a hybrid platform of Condor/DAGMan \cite{DAGMan} and MPI/DAGMan \cite{Rynge2012}) while the traditional task clustering technique requires all the tasks can be executed in the same execution environment. 
 
 
 %should fix it
@@ -265,5 +265,8 @@ In conclusion, we provide a solution to address the problem of scheduling large 
 
 \section{Summary}
 
-for other constraints
+
+In this chapter, we propose a framework of partitioning and scheduling large workflows to provide a fine granularity adjustment of workflow activities. We have proposed three heuristics to improve the data aware partitioning and experiments show that our heuristics significantly improve the overall performance including reducing intermediate data transfer, disk usage and the overall makespan. Even though we are using data constraint as an example in this chapter, our approach can be simply modified to apply to other constraints such as CPU, memory and bandwidth. 
+
+After workflow partitioning, we satisfy the resource constraints within an execution site. However, resources within an execution site are not evenly distributed and the balancing between computation and communication is another challenge. In next chapter, we will introduce our balanced task clustering to address this issue. 
 

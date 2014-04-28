@@ -5,7 +5,6 @@ Task clustering has been proven to be an effective method to reduce execution ov
 
 \section{Motivation}
 
-Task clustering is an effective method to reduce scheduling overhead and increase the computational granularity of tasks executing on distributed resources. However, a job composed of multiple tasks may have a greater risk of suffering from failures than a job composed of a single task. In this chapter we indicate that such failures can have a significant impact on the runtime performance of workflows under existing clustering strategies that ignore failures. 
 
 In task clustering, a clustered job consists of multiple tasks. A task is marked as failed (task failure) if it is terminated by unexpected events during the computation of this task. If a task within a job fails, this job has a job failure, even though other tasks within this job do not necessarily fail. In a faulty environment, there are several options for reducing the influence of workflow failures. First, one can simply retry the entire job when its computation is not successful as in the Pegasus \cite{Deelman2004}, ASKALON \cite{fahringer2007askalon} and Chemomentum \cite{schuller2008chemomentum}. However, some of the tasks within the job may have completed successfully and it could be a waste of time and resources to retry all of the tasks. Second, the application process can be periodically checkpointed such that when a failure occurs, the amount of work to be retried is limited. However, the overheads of checkpointing can limit its benefits \cite{Zhang2004}. Third, tasks can be replicated to different nodes to avoid failures that are related to one specific worker node \cite{Plankensteiner2009}. However, inappropriate clustering (and replication) parameters may cause severe performance degradation if they create long-running clustered jobs. As we will show, a long-running job that consists of many tasks has a higher job failure rate even when the inter-arrival time of failures is long. 
 
@@ -162,13 +161,13 @@ Figure \ref{fig:model_size} shows the relationship between the optimal clusterin
 
 \begin{figure*}[!htb]
 \centering
-  \includegraphics[width=0.75\linewidth]{figures/tolerance/model_makespan.eps}
+  \includegraphics[width=0.55\linewidth]{figures/tolerance/model_makespan.eps}
   \caption{Makespan with different clustering size and $\theta_{\gamma}$. ($n=1000$, $r=20$, $\theta_t=5$ sec, $\theta_s=50$ sec). The red dots are the minimums. }
   \label{fig:model_makespan}
 \end{figure*}
 \begin{figure*}[!htb]
 \centering
-  \includegraphics[width=0.75\linewidth]{figures/tolerance/model_size.eps}
+  \includegraphics[width=0.55\linewidth]{figures/tolerance/model_size.eps}
   \caption{Optimal clustering size (k*) with different  $\theta_{\gamma}$ ($n=1000$, $r=20$, $\theta_t=5$ sec, $\theta_s=50$ sec)}
   \label{fig:model_size}
 \end{figure*}
@@ -216,7 +215,7 @@ Horizontal Clustering (HC) merges multiple tasks that are at the same horizontal
 
 \begin{figure*}[!htb]
 \centering
-  \includegraphics[width=0.45\linewidth]{figures/tolerance/hcr.pdf}
+  \includegraphics[width=0.4\linewidth]{figures/tolerance/hcr.pdf}
   \caption{Horizontal Clustering (red boxes are failed tasks)}
   \label{fig:clustering_hc}
 \end{figure*}
@@ -229,7 +228,7 @@ Figure \ref{fig:clustering_hc} shows an example where the initial clustering siz
 
 \begin{figure*}[!htb]
 \centering
-  \includegraphics[width=0.40\linewidth]{figures/tolerance/sr.pdf}
+  \includegraphics[width=0.35\linewidth]{figures/tolerance/sr.pdf}
   \caption{Selective Reclustering (red boxes are failed tasks)}
   \label{fig:clustering_sr}
 \end{figure*}
@@ -260,7 +259,7 @@ Figure \ref{fig:clustering_hc} shows an example where the initial clustering siz
 
 \begin{figure*}[!htb]
 \centering
-  \includegraphics[width=0.45\linewidth]{figures/tolerance/dr.pdf}
+  \includegraphics[width=0.4\linewidth]{figures/tolerance/dr.pdf}
   \caption{Dynamic Reclustering (red boxes are failed tasks)}
   \label{fig:clustering_dr}
 \end{figure*}
@@ -295,7 +294,7 @@ Figure \ref{fig:clustering_hc} shows an example where the initial clustering siz
 
 \begin{figure*}[!htb]
 \centering
-  \includegraphics[width=0.75\linewidth]{figures/tolerance/vr.pdf}
+  \includegraphics[width=0.65\linewidth]{figures/tolerance/vr.pdf}
   \caption{Vertical Reclustering (red boxes are failed tasks)}
   \label{fig:clustering_vr}
 \end{figure*}
@@ -354,50 +353,29 @@ If there is a failure detected, we decrease $k$ by half and recluster them. In F
 \label{sec:tolerance:experiments}
 
 In this section, we evaluate our methods with five workflows, whose runtime information is gathered from real execution traces. The simulation-based approach allows us to control system parameters such as the inter-arrival time of task failures in order to clearly demonstrate the reliability of the algorithms. Our methods can also be applied to real workflow management systems as long as they support task-level failure monitoring. 
-Five widely used scientific workflow applications are used in the experiments: LIGO Inspiral analysis~\cite{LIGO}, Montage~\cite{Berriman2004}, CyberShake~\cite{Graves2010}, Epigenomics~\cite{Epigenome}, and SIPHT~\cite{SIPHT}. Their main characteristics and structures are shown in section \ref{sec:balance:applications}. 
+Five widely used scientific workflow applications are used in the experiments: LIGO Inspiral analysis~\cite{LIGO}, Montage~\cite{Berriman2004}, CyberShake~\cite{Graves2010}, Epigenomics~\cite{Epigenome}, and SIPHT~\cite{SIPHT}. Their main characteristics and structures are shown in section \ref{sec:applications}. 
 
-\begin{table}[!htb]
-	\setlength{\tabcolsep}{11pt}
-	\centering
-	\small
-	\begin{tabular}{lrrrr}
-		\hline
-		 & \multicolumn{1}{c}{Number} & \multicolumn{1}{c}{Average} &  \multicolumn{1}{c}{Average} \\
-		Workflow	& of Tasks	 & Data Size & Task Runtime \\
-		\hline
-		LIGO 		&800		& 5 MB	& 228s\\
-		Montage 		&300		&3 MB	&11s\\
-		CyberShake 	&700		&148 MB 	& 23s\\
-		Epigenomics 	&165 	& 355 MB	& 2952s\\
-		SIPHT		&1000	& 360 KB 	& 180s\\
-		\hline
-	\end{tabular}
-	\caption{Summary of the scientific workflows characteristics.}
-	\label{tab:evaluation_workflows}
-\end{table} 
 
-Table~\ref{tab:evaluation_workflows} shows the summary of the main \textbf{workflow characteristics}: number of tasks, average data size, and average task runtimes for the five workflows. 
 
 
 % Experiment conditions
 \subsection{Experiment conditions}
 \label{sec:tolerance:experiment_conditions}
-We adopt a trace-based simulation approach, where we extended our WorkflowSim~\cite{WorkflowSim} simulator with the fault tolerant clustering methods to simulate a controlled distributed environment. WorkflowSim is an open source workflow simulator that extends CloudSim~\cite{Calheiros2011} by providing support for task clustering, task scheduling, and resource provisioning at the workflow level. It has been recently used in multiple workflow study areas~\cite{WorkflowSim,Chen2012, jrad2013broker} and its correctness has been verified in~\cite{WorkflowSim}. 
+We adopt a trace-based simulation approach, where we extended our WorkflowSim~\cite{WorkflowSim} simulator with the fault tolerant clustering methods to simulate a controlled distributed environment. 
+The simulated computing platform is composed by 20 single homogeneous core virtual machines (worker nodes), which is the quota per user of some typical distributed environments such as Amazon EC2~\cite{AmazonAWS} and FutureGrid~\cite{Fox2013FutureGrid}. Each simulated virtual machine (VM) has 512MB of memory and the capacity to process 1,000 million instructions per second. The default network bandwidth is 15MB according to the real environment in FutureGrid from where our traces were collected. By default, we merge tasks at the same horizontal level into 20 clustered jobs initially, which is a simple selection of granularity control of the strength of task clustering. The study of granularity size has been done in~\cite{Chen2013b}, which shows such selection is acceptable.
 
-The simulated computing platform is composed by 20 single homogeneous core virtual machines (worker nodes), which is the quota per user of some typical distributed environments such as Amazon EC2~\cite{AmazonAWS} and FutureGrid~\cite{Fox2013FutureGrid}. Amazon EC2 is a commercial, public cloud that has been widely used in distributed computing, in particular for scientific workflows~\cite{Berriman2010}. FutureGrid is a distributed, high-performance testbed that provides scientists with a set of computing resources to develop parallel, grid, and cloud applications. Each simulated virtual machine (VM) has 512MB of memory and the capacity to process 1,000 million instructions per second. The default network bandwidth is 15MB according to the real environment in FutureGrid from where our traces were collected. By default, we merge tasks at the same horizontal level into 20 clustered jobs initially, which is a simple selection of granularity control of the strength of task clustering. The study of granularity size has been done in~\cite{Chen2013b}, which shows such selection is acceptable.
-
-We collected workflow execution traces~\cite{Juve2013, Chen2011} (including overhead and task runtime information) from real runs (executed on FutureGrid and Amazon EC2) of the scientific workflow applications described in Section~\ref{sec:balance:applications}. The traces are used to feed the Workflow Generator toolkit~\cite{WorkflowGenerator} to generate synthetic workflows. This allows us to perform simulations with several different configurations under controlled conditions. The toolkit uses the information gathered from actual scientific workflow executions to generate synthetic workflows resembling those used by real world scientific applications. The number of inputs to be processed, the number of tasks in the workflow, and their composition determine the structure of the generated workflow. Such an approach of traced based simulation allows us to utilize real traces and vary the system setting (i.e., the inter-arrival time of failures) and workflow (i.e., avg. task runtime) to fully explore the performance of our fault tolerant clustering algorithms. 
+We collected workflow execution traces~\cite{Juve2013, Chen2011} (including overhead and task runtime information) from real runs (executed on FutureGrid and Amazon EC2) of the scientific workflow applications described in Section~\ref{sec:applications}. The traces are used to feed the Workflow Generator toolkit~\cite{WorkflowGenerator} to generate synthetic workflows. This allows us to perform simulations with several different configurations under controlled conditions. The toolkit uses the information gathered from actual scientific workflow executions to generate synthetic workflows resembling those used by real world scientific applications. The number of inputs to be processed, the number of tasks in the workflow, and their composition determine the structure of the generated workflow. Such an approach of traced based simulation allows us to utilize real traces and vary the system setting (i.e., the inter-arrival time of failures) and workflow (i.e., avg. task runtime) to fully explore the performance of our fault tolerant clustering algorithms. 
 
 Three sets of experiments are conducted. Experiment 1 evaluates the performance of our fault tolerant clustering methods (DR, VR, and SR) over a baseline execution (HC) that is not fault tolerant for the five workflows. The goal of the experiment is to identify conditions where each method works best and worst. In addition, we also evaluate the performance improvement under different $\theta_{\gamma}$ (the inter-arrival time of task failures). The range of $\theta_{\gamma}$ is chosen from 10x to 1x of the average task runtime such that the workflows do not run forever and we can visualize the performance difference better. 
 
 
-Experiment 2 evaluates the performance impact of the variation of the average task runtime per level (defined as the average of all the tasks per level) and the average system overheads per level for one scientific workflow application (CyberShake). In particular, we are interested in the performance of DR based on the results of Experiment 1 and we use $\theta_{\gamma}=100$ since it has the maximum difference between the four methods. The original average task runtime of all the tasks of the CyberShake workflow is about 23 seconds as shown in Table~\ref{tab:evaluation_workflows}. In this experiment, we multiply the average task runtime by a multiplier from 0.5 to 1.3. The scale parameter of the system overheads ($\theta_{s}$) is 50 seconds originally based on our traces and we multiply the system overheads by a multiplier from 0.2 to 1.8.  
+Experiment 2 evaluates the performance impact of the variation of the average task runtime per level (defined as the average of all the tasks per level) and the average system overheads per level for one scientific workflow application (CyberShake). In particular, we are interested in the performance of DR based on the results of Experiment 1 and we use $\theta_{\gamma}=100$ since it has the maximum difference between the four methods. The original average task runtime of all the tasks of the CyberShake workflow is about 23 seconds as shown in Table~\ref{tab:model_workflows}. In this experiment, we multiply the average task runtime by a multiplier from 0.5 to 1.3. The scale parameter of the system overheads ($\theta_{s}$) is 50 seconds originally based on our traces and we multiply the system overheads by a multiplier from 0.2 to 1.8.  
 
 Experiment 3 evaluates the performance of dynamic estimation and static estimation. In the static estimation process, we only use the prior knowledge to estimate the MLEs of $\theta_t$, $\theta_s$ and $\theta_{\gamma}$. In the dynamic estimation process, we also leverage the runtime data collected during the execution and update the MLEs respectively. 
 
 \begin{figure*}[htb]
 	\centering
-	\includegraphics[width=0.8\linewidth]{figures/tolerance/step_signal.pdf} \\
+	\includegraphics[width=0.6\linewidth]{figures/tolerance/step_signal.pdf} \\
 	\caption{A Step Function of $\theta_{\gamma}$. $t_c$ is the current time and $T_d$ is the moment $\theta_{\gamma}$ changes from 500 to 50 seconds}
 	\label{fig:evaluation_step_signal}
 \end{figure*}
@@ -416,7 +394,7 @@ In this experiment, we use two sets of $\theta_{\gamma}$ function. The first one
 
 \begin{figure*}[htb]
 	\centering
-	\includegraphics[width=0.8\linewidth]{figures/tolerance/pulse_signal.pdf} \\
+	\includegraphics[width=0.6\linewidth]{figures/tolerance/pulse_signal.pdf} \\
 	\caption{A Pulse Function of $\theta_{\gamma}$. $t_c$ is the current time and $T_c$ is the period of the wave. $\tau$ is the width of the pulse. }
 	\label{fig:evaluation_pulse_signal}
 \end{figure*}
@@ -497,7 +475,7 @@ Figure~\ref{fig:expr_sipht}, \ref{fig:expr_genome}, \ref{fig:expr_cybershake}, \
   \label{fig:expr_ligo}
 \end{figure}
 
-3). The performance of VR is highly related to the workflow structure and the average task runtime. For example, according to Figure \ref{fig:evaluation_shape_genome} and Table \ref{tab:evaluation_workflows}, we know that the Epigenomics workflow has a long task runtime (around 50 minutes) and the pipeline length is 4. It means vertical clustering creates really long jobs ($\sim 50\times 4=200$ minutes) and thereby VR is more sensitive to the decrease of $\gamma$. As indicated in Figure \ref{fig:expr_genome}, the makespan increases more significantly with the decrease of $\theta_{\gamma}$ than other workflows. In comparison, the CyberShake workflow does not leave much space for vertical clustering methods to improve since it does not have many pipelines as shown in Figure~\ref{fig:evaluation_shape_cybershake}. In addition, the average task runtime of the CyberShake workflow is relatively short (around 23 seconds). Compared to horizontal methods such as HC, SR and DR, vertical clustering does not generate long jobs and thus the performance of VR is less  sensitive to $\theta_{\gamma}$. 
+3). The performance of VR is highly related to the workflow structure and the average task runtime. For example, according to Figure \ref{fig:model_shape_genome} and Table \ref{tab:model_workflows}, we know that the Epigenomics workflow has a long task runtime (around 50 minutes) and the pipeline length is 4. It means vertical clustering creates really long jobs ($\sim 50\times 4=200$ minutes) and thereby VR is more sensitive to the decrease of $\gamma$. As indicated in Figure \ref{fig:expr_genome}, the makespan increases more significantly with the decrease of $\theta_{\gamma}$ than other workflows. In comparison, the CyberShake workflow does not leave much space for vertical clustering methods to improve since it does not have many pipelines as shown in Figure~\ref{fig:model_shape_cybershake}. In addition, the average task runtime of the CyberShake workflow is relatively short (around 23 seconds). Compared to horizontal methods such as HC, SR and DR, vertical clustering does not generate long jobs and thus the performance of VR is less  sensitive to $\theta_{\gamma}$. 
 
 %4). Under some cases, i.e., the CyberShake workflow, we see that VR does not perform well compared to DR or SR. The reason is the graph structure of the CyberShake workflow does not leave much space for vertical clustering methods to improve since it does not have many pipelines as shown in Figure~\ref{fig:evaluation_shape_cybershake}. DR, a modification of HC, is more likely to improve the performance since most of these workflows have many parallel tasks in the same level. 
 
@@ -565,6 +543,4 @@ For the pulse function of $\theta_{\gamma}$, we use $\tau=0.1T_c, 0.3T_c, 0.5T_c
 
 
 \section{Summary}
-In this chapter, we model transient failures in a distributed environment and assess their influence of task clustering. We propose three dynamic clustering methods to improve the fault tolerance of task clustering and apply them to five widely used scientific workflows. From our experiments, we conclude that the three proposed methods improve the makespan significantly compared to an existing algorithm widely used in workflow management systems. In particular, our Dynamic Reclustering method performs best among the three methods since it can adjust the clustering size based on the Maximum Likelihood Estimation of task runtime, system overheads and the inter-arrival time of failures. Our Vertical Reclustering method improves the performance significantly for  workflows that have a short task runtime. Our dynamic estimation using on-going data collected from the workflow execution can further improve the fault tolerance in a dynamic environment where the inter-arrival time of failures is fluctuant. In this chapter, we only discuss the fault tolerant clustering and apply it to a homogeneous environment. In the future, we aim to combine our work with fault tolerant scheduling in heterogeneous environments, i.e, a scheduling algorithm that avoids mapping clustered jobs to failure-prone nodes. We are also interested to combine vertical clustering methods with horizontal clustering methods. For example, we can perform vertical clustering either before or after horizontal clustering, which we believe would bring different performance improvement. 
-As shown in our experiments, our dynamic estimation works well under some constraints, which encourages us to improve its performance further. For example, we may weight data based on the time it was collected, the closer the more weight on it. 
-
+In this chapter, we model transient failures in a distributed environment and assess their influence of task clustering. We propose three dynamic clustering methods to improve the fault tolerance of task clustering and apply them to five widely used scientific workflows. From our experiments, we conclude that the three proposed methods improve the makespan significantly compared to an existing algorithm widely used in workflow management systems. In particular, our Dynamic Reclustering method performs best among the three methods since it can adjust the clustering size based on the Maximum Likelihood Estimation of task runtime, system overheads and the inter-arrival time of failures. Our Vertical Reclustering method improves the performance significantly for  workflows that have a short task runtime. Our dynamic estimation using on-going data collected from the workflow execution can further improve the fault tolerance in a dynamic environment where the inter-arrival time of failures is fluctuant. 
