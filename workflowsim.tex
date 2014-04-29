@@ -27,15 +27,15 @@ TACC & alamo & 96 & 192 & 768 & 1152 & 30 \\\hline
 
 \subsection{WorkflowSim}
 
-We have developed WorkflowSim as an open source workflow simulator that extends CloudSim \cite{Calheiros2011} by providing a workflow level support of simulation. It models workflows with a DAG model with support an elaborate model of node failures, a model of delays occurring in the various levels of the WMS stack \cite{Chen2011}, the implementations of several most popular dynamic and static workflow schedulers (e.g., HEFT, Min-Min) and task clustering algorithms (e.g., runtime-based algorithms, data-oriented algorithms and fault tolerant clustering algorithms). Parameters are imported from traces of workflow executions that were run on FutureGrid~\cite{Fox2013FutureGrid}. %However, an accurate simulation framework for scientific workflows is required to generate reasonable results, particularly considering that the overall system overhead \cite{Chen2011} plays a significant role in the workflow’s runtime. 
+We have developed WorkflowSim as an open source workflow simulator that extends CloudSim \cite{Calheiros2011} by providing a workflow level support of simulation. It models workflows with an o-DAG model with support of an elaborate model of node failures, a model of delays occurring in the various levels of the WMS stack \cite{Chen2011}, the implementations of several most popular dynamic and static workflow schedulers (e.g., HEFT\cite{Topcuoglu2002} and MinMin\cite{Blythe2005}) and task clustering algorithms (e.g., runtime-based algorithms \cite{Chen2013b}, data-oriented algorithms \cite{Chen2013b} and fault tolerant clustering algorithms \cite{Chen2012}). Parameters are imported from traces of workflow executions that were run on FutureGrid~\cite{Fox2013FutureGrid}. %However, an accurate simulation framework for scientific workflows is required to generate reasonable results, particularly considering that the overall system overhead \cite{Chen2011} plays a significant role in the workflow’s runtime. 
 In heterogeneous distributed systems, workflows may experience different types of overheads, which are defined as the time of performing miscellaneous work other than executing users’ computational activities.  Since the causes of overheads differ, the overheads have diverse distributions and behaviors. For example, the time to run a post-script that checks the return status of a computation is usually a constant. However, queue delays incurred while tasks are waiting in a batch scheduling systems can vary widely. 
 By classifying these workflow overheads in different layers and system components, our simulator can offer a more accurate result than simulators that do not include overheads in their system models.
-What’s more, many researchers \cite{Zhang2004, Tang1990, Schroeder2006, Sahoo2004, Oppenheimer2002, McConnel1979} have emphasized the importance of fault tolerant design and concluded that the failure rates in modern distributed systems should not be neglected. A simulation with support for randomization and layered failures is supported in WorkflowSim to promote such studies. 
-Finally, progress in workflow research also requires a general-purpose framework that can support widely accepted features of workflows and optimization techniques. Existing simulators such as CloudSim/GridSim \cite{Calheiros2011} fail to provide fine granularity simulations of workflows. For example, they lack the support of task clustering, which is a popular technique that merges small tasks into a large job to reduce task execution overheads. The simulation of task clustering requires two layers of execution model, on both task and job levels. It also requires a workflow-clustering engine that launches algorithms and heuristics to cluster tasks. Other techniques such as workflow partitioning and task retry are also ignored in these simulators. These features have been implemented in WorkflowSim. 
+What’s more, many researchers \cite{Zhang2004, Tang1990, Schroeder2006, Sahoo2004, Oppenheimer2002, McConnel1979} have emphasized the importance of fault tolerant design and concluded that the failure rates in modern distributed systems should not be neglected. A simulation with support of randomization and layered failures is implemented in WorkflowSim to promote such studies. 
+Finally, progress in workflow research also requires a general-purpose framework that can support widely accepted features of workflows and optimization techniques. Existing simulators such as CloudSim/GridSim \cite{Calheiros2011} fail to provide fine granularity simulations of workflows. For example, they lack the support of task clustering. The simulation of task clustering requires two layers of execution model, on both task and job levels. It also requires a workflow-clustering engine that launches algorithms and heuristics to cluster tasks. Other techniques such as workflow partitioning and task retry are also ignored in these simulators. These features have been implemented in WorkflowSim. 
 
 To the best of our knowledge, none of the current distributed system simulators support these rich-features and techniques. Below, we introduce our early work on simulating scientific workflows satisfying these requirements. We evaluate the performance of WorkflowSim with an example of task clustering. 
 
-\subsection{Components and Functionalities}
+\subsubsection{Components and Functionalities}
 
 \begin{figure}[!htb]
 	\centering
@@ -48,37 +48,21 @@ Deelman et. al. \cite{Deelman2009} have provided a survey of popular workflow sy
 
 \begin{enumerate}
 
-\item {Workflow Mapper} is used to import DAG files formatted in XML (called DAX in WorkflowSim) and other metadata information such as file size from Workflow Generator. Workflow Mapper creates a list of tasks and assigns these tasks to an execution site. A task is a program/activity that a user would like to execute. 
+\item {Workflow Mapper} is used to import DAG files formatted in XML (called DAX in WorkflowSim) and other metadata information such as file size from Workflow Generator \cite{WorkflowGenerator}. Workflow Mapper creates a list of tasks and assigns these tasks to an execution site. A task is a program/activity that a user would like to execute. 
 
-\item{Workflow Engine} manages tasks based on their dependencies between tasks to assure that a task may only be released when all of its parent tasks have completed successfully. The Workflow Engine will only release free tasks to Clustering Engine. 
+\item{Workflow Engine} manages tasks based on their dependencies between tasks to assure that a task may only be released when all of its parent tasks have completed successfully. Workflow Engine will only release free tasks to Clustering Engine. 
 
-\item{Clustering engine} merges tasks into jobs such that the scheduling overhead is reduced. A job is an atomic unit seen by the execution system, which contains multiple tasks to be executed in sequence or in parallel if applicable. Different to the clustering engine in Pegasus WMS, Clustering Engine in WorkflowSim also perform task reclustering in a faulty environment with transient failures. If there are failed tasks returned from Workflow Scheduler, they are merged again into a new job.  
+\item{Clustering engine} merges tasks into jobs such that the scheduling overhead is reduced. A job is an atomic unit seen by the execution system, which contains multiple tasks to be executed in sequence or in parallel if applicable. Different to the clustering engine in Pegasus WMS, Clustering Engine in WorkflowSim also performs task reclustering in a faulty environment. The details will be introduced in Chapter \ref{chap:tolerance}. 
 
 \item{Workflow Scheduler} is used to match jobs to a worker node based on the criteria selected by users. WorkflowSim relies on CloudSim to provide an accurate and reliable job-level execution model, such as time-shared model and space-shared model. However, WorkflowSim has introduced different layers of overheads and failures based on our prior work \cite{Chen2011}, which improves the accuracy of simulation. 
 
-\item{Failure Generator} is introduced to inject task/job failures at each execution site during the simulation. After the execution of each job, Failure Generator randomly generates task/job failures based on the distribution and average failure rate that a user has specified. \item{Failure Monitor} collects failure records (e.g., resource id, job id, task id) to return these records to Clustering Engine to adjust the scheduling strategies dynamically. In a failure-prone environment, there are several options to improve workflow performance. First, one can simply retry the entire job or only the failed part of this job when its computation is not successful.  This functionality is added to the Workflow Scheduler, which checks the status of this job and takes action based on the strategies that a user selects. 
-
-\end{enumerate}
-
-WorkflowSim extracts the common features exposed by various workflow systems and supports widely used workflow features and optimization techniques. Below we list the main functionalities supported by WorkflowSim. Note that WorkflowSim is an open source community and more functionalities are added at the same time. 
-
-\begin{enumerate}
-\item{Overhead Modeling}: Based on our prior studies on workflow overheads \cite{Chen2011}, we add layered overhead to the workflow simulation. We have classified workflow overheads into five categories as follows. Workflow Engine Delay measures the time between when the last parent job of a job completes and the time when the job gets submitted to the local queue. Queue Delay is defined as the time between the submission of a job by the workflow engine to the local queue and the time the local scheduler sees the job running. Data Transfer Delay happens when data is transferred between nodes. Clustering Delay measures the difference between the sum of the actual task runtime and the job runtime seen by the Workflow Scheduler. 
-
-\item{Failure Modeling}: WorkflowSim supports two types failures. A task failure which means a task fails while other tasks in the same job may not fail. A job failure means a job fails while all of its tasks fail. The reason why we have this classification of transient failures is that they usually have different causes. Task failure is usually generated by an error during the execution while a job failure happens during the preparation of a job.   Users can specify the distribution (Weibull, Uniform, Normal and Gamma) of the failure rates. 
-
-\item{Shared and Distributed File Systems}: Modern file systems are usually classified into two types. The first one is a central file system in which the data storage is shared among all the worker nodes in a data-center. The communication cost is thereby included in the execution time of a task and scheduling algorithms do not necessary consider the data transfer delay between tasks. The second is a distributed file system in which the data storage is constructed with multiple separate local data storages. The communication cost should not be ignored and data-aware scheduling algorithms can apply to this environment to optimize the data locality and the overall makespan. In either way, WorkflowSim uses a Replica Catalog to keep track of the files including their replications. 
-
-\item{Dynamic Scheduling Algorithm}: While CloudSim has already supported static scheduling algorithms, we added the support of dynamic workflow algorithms in WorkflowSim. For static algorithms, jobs are assigned to a worker node at the workflow planning stage. When a job reaches the remote scheduler, it will just wait until the assigned worker node is free. For dynamic algorithms, jobs are matched to a worker node in the remote scheduler whenever a worker node becomes idle. This classification proposes new options for researchers to evaluate the dynamic performance of their algorithms. 
-
-\item{Task Clustering}: Compared to CloudSim and other workflow simulators, WorkflowSim provides support of task clustering that merges tasks into a clustered job. Users can specify different criteria to optimize the overall performance. For example, in a fault environment, a long job would end up with running forever even though the overheads are reduced. 
-
-\item{Energy aware}:
+\item{Failure Generator} is introduced to inject task/job failures at each execution site during the simulation. After the execution of each job, Failure Generator randomly generates task/job failures based on the distribution that a user has specified. \item{Failure Monitor} collects failure records (e.g., resource id, job id, task id) and returns these records to Clustering Engine to adjust the clustering strategies dynamically. 
 
 \end{enumerate}
 
 
-\subsection{Results and Validation}We use task clustering as an example to illustrate the necessity of introducing overheads into workflow simulation. The goal was to compare the simulated overall runtime of workflows in case the information of job runtime and system overheads are known and extracted from prior traces. In this example, we collected real traces generated by the Pegasus Workflow Management System while executing workflows on FutureGrid \cite{Fox2013FutureGrid}. We built an execution site with 20 worker nodes and we executed the Montage workflow five times in every single configuration of $clusters.num$, which is the maximum number of clustered jobs in a horizontal level. These five traces of workflow execution with the same $clusters.num$ is a training set or a validation set. 
+
+\subsubsection{Results and Validation}We use task clustering as an example to illustrate the necessity of introducing overheads into workflow simulation. The goal was to compare the simulated overall runtime of workflows in case the information of job runtime and system overheads are known and extracted from prior traces. In this example, we collected real traces generated by the Pegasus Workflow Management System while executing workflows on FutureGrid \cite{Fox2013FutureGrid}. We built an execution site with 20 worker nodes and we executed the Montage workflow five times in every single configuration of $clusters.num$, which is the maximum number of clustered jobs in a horizontal level. These five traces of workflow execution with the same $clusters.num$ is a training set or a validation set. 
 %Partly illustrated by Figure 5, the results are stable enough to be used as a training set. 
 We ran the Montage workflow with a size of 8-degree squares of sky. The workflow has 10,422 tasks and 57GB of overall data. We tried different $clusters.num$ from 20 to 100, leaving us 5 groups of data sets with each group having 5 workflow traces. First of all, we adopt a simple approach that selects a training set to train WorkflowSim and then use the same training set as validation set to compare the predicted overall runtime and the real overall runtime in the traces. We define accuracy in this section as the ratio between the predicted overall runtime and the real overall runtime:
 \begin{equation} \label{eq:model_wfs_accuracy}
@@ -89,10 +73,9 @@ Accuracy=\frac{Predicted~Overall~Runtime}{Real~Overall~Runtime}
     \includegraphics[width=0.7\textwidth]{figures/model/wfs_levels.eps}
     \caption{Performance of WorkflowSim with different support levels}
     \label{fig:model_wfs_levels}
-\end{figure}  Performance of WorkflowSim with different support levels. To train WorkflowSim, from the traces of workflow execution (training sets), we extracted information about job runtime and overheads, such as average/distribution and, for example, whether it has a cyclic increase. We then added these parameters into the generation of system overheads and simulated them as close as possible to the real cases. Here, we do not discuss the randomization or distribution of job runtime since we rely on CloudSim to provide a convincing model of job execution.
-To present an explicit comparison, we simulated the cases using WorkflowSim that has no consideration of workflow dependencies or overheads (Case 1), WorkflowSim with Workflow Engine that has considered the influence of dependencies but ignored overheads (Case 2), and WorkflowSim, that has covered both aspects (Case 3). Intuitively speaking, we expect that the order of the accuracy of them should be Case 3 $>$ Case 2 $>$ Case 1. Fig~\ref{fig:model_wfs_levels} shows the performance of WorkflowSim with different support levels is consistent to our expectation. The accuracy of Case 3 is quite close to but not equal to 1.0 in most points. The reason is that to simulate workflows, WorkflowSim has to simplify models with a few parameters, such as the average value and the distribution type. It is not efficient to recur every overhead as is present in the real traces. It is also impossible to do since the traces within the same training set may have much variance. Fig~\ref{fig:model_wfs_levels} also shows that the accuracy of both Case 1 and Case 2 are much lower than Case 3. The reason why Case 1 does not give an exact result is that it ignores both dependencies and multiple layers of overheads. By ignoring data dependencies, it releases tasks that are not supposed to run since their parents have not completed (a real workflow system should never do that) and thereby reducing the overall runtime. At the same time, it executes jobs/tasks irrespective of the actual overheads, which further reduces the simulated overall runtime. In Case 2, with the help of Workflow Engine, WorkflowSim is able to control the release of tasks and thereby the simulated overall runtime is closer to the real traces. However, since it has ignored most overheads, jobs are completed and returned earlier than that in real traces. The low accuracy of Case 1 and Case 2 confirms the necessity of introducing overhead design into our simulator. 
-
-\section{Workflows Used}
+\end{figure}  Performance of WorkflowSim with different support levels. To train WorkflowSim, from the traces of workflow execution (training sets), we extracted information about job runtime and overheads, such as average/distribution and, for example, whether it has a cyclic increase. We then added these parameters into the generation of system overheads and simulated them as close as possible to the real cases. 
+To present an explicit comparison, we simulated the cases using WorkflowSim that has no consideration of workflow dependencies or overheads (Case 1), WorkflowSim with Workflow Engine that has considered the influence of dependencies but ignored overheads (Case 2), and WorkflowSim, that has covered both aspects (Case 3). Intuitively speaking, we expect that the order of the accuracy of them should be Case 3 $>$ Case 2 $>$ Case 1. Fig~\ref{fig:model_wfs_levels} shows that the performance of WorkflowSim with different support levels is consistent to our expectation. The accuracy of Case 3 is quite close to but not equal to 1.0 in most points. The reason is that to simulate workflows, WorkflowSim has to simplify models with a few parameters, such as the average value and the distribution type. It is not efficient to recur every overhead as is present in the real traces. It is also impossible to do so since the traces within the same training set may have much variance in each run. Fig~\ref{fig:model_wfs_levels} also shows that the accuracy of both Case 1 and Case 2 are much lower than that of Case 3. The reason is that it ignores both dependencies and multiple layers of overheads. By ignoring data dependencies, it releases tasks that are not supposed to run since their parents have not completed (a real workflow system should never do that) and thereby reducing the overall runtime. At the same time, it executes jobs/tasks irrespective of the actual overheads, which further reduces the simulated overall runtime. In Case 2, with the help of Workflow Engine, WorkflowSim is able to control the release of tasks and thereby the simulated overall runtime is closer to the real traces. However, since it has ignored most overheads, jobs are completed and returned earlier than that in real traces. The low accuracy of Case 1 and Case 2 confirms the necessity of introducing overhead design into our simulator. 
+\section{Workflows Used}
 \label{sec:applications}
 
 Five widely used scientific workflow applications are used in this thesis: LIGO Inspiral analysis~\cite{LIGO}, Montage~\cite{Berriman2004}, CyberShake~\cite{Graves2010}, Epigenomics~\cite{Epigenome}, and SIPHT~\cite{SIPHT}. In this section, we describe each workflow application and present their main characteristics and structures.
@@ -100,7 +83,7 @@ Five widely used scientific workflow applications are used in this thesis: LIGO 
 \paragraph{\textbf{LIGO}}
 \begin{figure*}[!htb]
 	\centering
-	\includegraphics[width=0.5\linewidth]{figures/workflowsim/ligo_shape.pdf} \\
+	\includegraphics[width=0.45\linewidth]{figures/workflowsim/ligo_shape.pdf} \\
 	\caption{A simplified visualization of the LIGO Inspiral workflow.}
 	\label{fig:model_shape_ligo}
 \end{figure*}
@@ -108,7 +91,7 @@ Laser Interferometer Gravitational Wave Observatory (LIGO)~\cite{LIGO} workflows
 
 \begin{figure*}[htb]
 	\centering
-	\includegraphics[width=0.45\linewidth]{figures/workflowsim/montage_shape.pdf} \\
+	\includegraphics[width=0.4\linewidth]{figures/workflowsim/montage_shape.pdf} \\
 	\caption{A simplified visualization of the Montage workflow.}
 	\label{fig:model_shape_montage}
 \end{figure*}
@@ -118,7 +101,7 @@ Montage~\cite{Berriman2004} is an astronomy application that is used to construc
 
 \begin{figure*}[htb]
 	\centering
-	\includegraphics[width=0.55\linewidth]{figures/workflowsim/cybershake_shape.pdf} \\
+	\includegraphics[width=0.5\linewidth]{figures/workflowsim/cybershake_shape.pdf} \\
 	\caption{A simplified visualization of the CyberShake workflow.}
 	\label{fig:model_shape_cybershake}
 \end{figure*}
@@ -128,18 +111,18 @@ CyberShake~\cite{Graves2010} is a seismology application that calculates Probabi
 
 \begin{figure*}[htb]
 	\centering
-	\includegraphics[width=0.8\linewidth]{figures/workflowsim/genome_shape.pdf} \\
+	\includegraphics[width=0.7\linewidth]{figures/workflowsim/genome_shape.pdf} \\
 	\caption{A simplified visualization of the Epigenomics workflow with multiple branches.}
 	\label{fig:model_shape_genome}
 \end{figure*}
 
 \paragraph{\textbf{Epigenomics}}
-The Epigenomics workflow~\cite{Epigenome} is a data-parallel workflow. Initial data are acquired from the Illumina-Solexa Genetic Analyzer in the form of DNA sequence lanes. Each Solexa machine can generate multiple lanes of DNA sequences. These data are converted into a format that can be used by sequence mapping software. The mapping software can do one of two major tasks. It either maps short DNA reads from the sequence data onto a reference genome, or it takes all the short reads, treats them as small pieces in a puzzle and then tries to assemble an entire genome. In our experiments, the workflow maps DNA sequences to the correct locations in a reference Genome. This generates a map that displays the sequence density showing how many times a certain sequence expresses itself on a particular location on the reference genome. Epigenomics is a CPU-intensive application and its simplified structure is shown in Figure~\ref{fig:model_shape_genome}. 
+The Epigenomics workflow~\cite{Epigenome} is a data-parallel workflow. Initial data are acquired from the Illumina-Solexa Genetic Analyzer in the form of DNA sequence lanes. Each Solexa machine can generate multiple lanes of DNA sequences. Then the workflow maps DNA sequences to the correct locations in a reference Genome. This generates a map that displays the sequence density showing how many times a certain sequence expresses itself on a particular location on the reference genome. Epigenomics is a CPU-intensive application and its simplified structure is shown in Figure~\ref{fig:model_shape_genome}. 
 %Different to the LIGO Inspiral workflow, each branch in Epigenomics has exactly the same number of pipelines, which makes it more symmetric. 
 
 \begin{figure*}[htb]
 	\centering
-	\includegraphics[width=0.6\linewidth]{figures/workflowsim/sipht_shape.pdf} \\
+	\includegraphics[width=0.5\linewidth]{figures/workflowsim/sipht_shape.pdf} \\
 	\caption{A simplified visualization of the SIPHT workflow.}
 	\label{fig:model_shape_sipht}
 \end{figure*}
@@ -174,4 +157,4 @@ Table~\ref{tab:model_workflows} shows the summary of the main \textbf{workflow c
 
 \section{Summary}
 
-In this chapter, we have introduced the workflow and system models including an overhead aware DAG model that we have proposed, the execution environments including a workflow simulator that we have developed, and the workflows used in this thesis. As indicated by Table~\ref{tab:model_clusters}, resources particular the data storage are limited in a data center. In next chapter, we will introduce the first approach called Workflow Partitioning to address the optimization of task granularity with resource constraints. 
+In this chapter, we have introduced the workflow and system models including an overhead aware DAG model that we have proposed, the execution environments including a workflow simulator that we have developed, and the workflows used in this thesis. As indicated by Table~\ref{tab:model_clusters}, resources such the data storage are limited in a data center. In next chapter, we will introduce the first proposed approach called Workflow Partitioning to address the optimization of task granularity with resource constraints. 

@@ -1,7 +1,7 @@
 \chapter{Background}
 \label{chap:model}
 
-In this chapter, we first introduce how we extend the existing DAG model to be overhead aware and we also describe the system model that we use in this thesis. Second we present our overhead analysis on a series of widely used workflows, which is a base of our optimization methods that will be used in simulations. Third, we introduce the experiment environments used in this thesis including FutureGrid, a distributed platform and a workflow simulator as an example of the importance of an overhead model when simulating workflow execution. The simulation of a widely used workflow verifies the necessity of taking overhead into consideration. 
+In this chapter, we first introduce how we extend the existing DAG model to be overhead aware and we also describe the system model that we use in this thesis. Second we present our overhead analysis on a series of widely used workflows, which is a base of our optimization methods that will be used in simulations. Third, we introduce the experiment environments used in this thesis including FutureGrid, a distributed platform and a workflow simulator as an example of the importance of an overhead model when simulating workflow execution. The simulation of a widely used workflow verifies the necessity of taking overheads into consideration. 
 \section{Workflow and System Model}
 
 \begin{figure}[h!]
@@ -12,8 +12,8 @@ In this chapter, we first introduce how we extend the existing DAG model to be o
 \end{figure}
 
 Traditionally a workflow is modeled as a Directed Acyclic Graph (DAG). As shown in Figure~\ref{fig:model_dag}, each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. 
-%A job ($j$) is a single execution unit and it contains one or multiple task(s).
  The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. 
+A job ($j$) is a single execution unit and it contains one or multiple task(s). The process of merging tasks into a clustered job is called task clustering. We will introduce the modeling of task clustering in Section~\ref{sec:task_clustering}. 
 
 Workflows are typically prepared and executed in a Workflow Management System such as Pegasus \cite{Deelman2004}, ASKALON \cite{Ostermann2009b} and Taverna \cite{Calasanz2008}. The components of a WMS are listed below: 
 
@@ -25,13 +25,13 @@ Workflows are typically prepared and executed in a Workflow Management System su
   \label{fig:model_system}
 \end{figure}
 
-\textbf{Workflow Mapper} generates an executable workflow based on an abstract workflow provided by the user or workflow composition system. 
+\textbf{Workflow Mapper} generates an executable workflow based on an abstract workflow provided by a user or a workflow composition system. 
 \textbf{Workflow Engine} executes the jobs defined by the workflow in order of their dependencies. Only free jobs that have all their parent jobs completed are submitted to  Job Scheduler. 
 \textbf{Job Scheduler} and \textbf{Local Queue} manage individual workflow jobs and supervise their execution on local and remote resources.
 \textbf{Job Wrapper} extracts tasks from clustered jobs and executes them at the worker nodes. 
 
-A DAG models the computational activities and data dependencies within a workflow and it fits with most workflow management systems such as Pegasus \cite{Deelman2004} and DAGMan \cite{Kalayci2010}. However, the preparation and execution of a scientific workflow in distributed environments often involves multiple components and the system overheads within and between these components are ignored. 
-An overhead is defined as the time of performing miscellaneous work other than executing the user’s computational activities. 
+A DAG models the computational activities and data dependencies within a workflow and it fits with most workflow management systems such as Pegasus \cite{Deelman2004} and DAGMan \cite{Kalayci2010}. However, the preparation and execution of a scientific workflow in distributed environments often involve multiple components and the system overheads within and between these components cannot be ignored. 
+An overhead is defined as the time of performing miscellaneous work other than executing computational activities. 
 To address this challenge, in this section, we extend the existing Directed Acyclic Graph (DAG) model to be overhead aware (o-DAG), in which an overhead is also a node in the DAG and the control dependencies are added as directed edges. We utilize o-DAG to provide a systematic analysis of the performance of workflow optimization methods and provide a series of novel optimization methods to further improve the overall workflow performance. 
 
 
@@ -48,10 +48,11 @@ To address this challenge, in this section, we extend the existing Directed Acyc
 \end{figure}
 
 %In this work, we extend the DAG model to be overhead aware (o-DAG). The reason is that system overheads play an important role in workflow execution and they constitute a major part of the overall runtime when tasks are poorly clustered. 
-Fig~\ref{fig:model_odag} shows how we augment a DAG to be an o-DAG with the capability to represent scheduling overheads ($s$) such as workflow engine delay, queue delay, and postscript delay. The classification of overheads is based on the model of a typical workflow management system shown in Fig~\ref{fig:model_system}. 
+Fig~\ref{fig:model_odag} shows how we augment a DAG to be an o-DAG with the capability to represent scheduling overheads ($s$) such as workflow engine delay, queue delay, and postscript delay. The classification of overheads is based on the model of a typical workflow management system shown in Fig~\ref{fig:model_system} and will be introduced in Section \ref{sec:overheads}. 
 
 
 \section{Modeling Task Clustering}
+\label{sec:task_clustering}
 
 \begin{figure}[h!]
 \centering
@@ -128,6 +129,7 @@ Figure~\ref{fig:model_vc} illustrates an example of vertical clustering, in whic
 
 
 \section{Workflow Overheads}
+\label{sec:overheads}
 \subsection{Overhead Classification}
 
 
@@ -151,14 +153,14 @@ We have classified workflow overheads into five categories as follows.
 The completion time of the last parent job means this job is released to the ready queue and is waiting for resources to be assigned to it. The workflow engine delay reflects the efficiency of a workflow engine (i.e., DAGMan \cite{DAGMan}). 
 \item{Queue Delay} is defined as the time between the submission of a job by the workflow engine to the local queue and the time the local scheduler sees the job running. This overhead reflects the efficiency of the local workflow scheduler (e.g. Condor \cite{Frey2002}) to execute a job and the availability of resources for the execution of this job. 
 %The queue delay is an estimate of the time spent in the local queue on the submit host. 
-\item{Postscript Delay } is the time taken to execute a lightweight script under some execution systems after the execution of a job. Postscripts examine the status code of a job after the computational part of this job is done.
+\item{Postscript Delay} is the time taken to execute a lightweight script under some execution systems after the execution of a job. Postscripts examine the status code of a job after the computational part of this job is done.
 \item{Data Transfer Delay} happens when data is transferred between nodes. It includes three different types of processes: staging data in, cleaning up, and staging data out. Stage-in jobs transfer input files from source sites to execution sites before the computation starts. Cleanup jobs delete intermediate data that is no longer needed by the remainder of the workflow. Stage-out jobs transfer workflow output data to archiving sites for storage and analysis.
 \item{Clustering Delay} measures the difference between the sum of the actual task runtime and the job runtime seen by the job wrapper. The cause of Clustering Delay is usually because we use a job wrapper in worker nodes to execute a clustered job that requires some delay to extract the list of tasks. 
 \end{enumerate}
 
 \subsection{Overhead Distribution}
 
-We examined the overhead distributions of a widely used astronomy workflow called Montage \cite{Berriman2004} that is used to construct large image mosaics of the sky. Montage was run on FutureGrid \cite{Fox2013FutureGrid}. FutureGrid is a distributed, high-performance testbed that provides scientists with a set of computing resources to develop parallel, grid, and cloud applications. 
+We examined the overhead distributions of a widely used astronomy workflow called Montage \cite{Berriman2004} that is used to construct large image mosaics of the sky. Montage was run on FutureGrid \cite{Fox2013FutureGrid}. The details of FutureGrid will be introduced in Section \ref{sec:experiments}. 
 Figure~\ref{fig:model_montage_queue_delay}, \ref{fig:model_montage_engine_delay} and \ref{fig:model_montage_postscript_delay} show the overhead distribution of the Montage workflow run on the FutureGrid. The postscript delay concentrates at 7 seconds, because the postscript is only used to locally check the return status of a job and is not influenced by the remote execution environment. The workflow engine delay tends to have a uniform distribution, which is because the workflow engine spends a constant amount of time to identify that the parent jobs have completed and insert a job that is ready at the end of the local queue. 
 The queue delay has three decreasing peak points at 8, 14, and 22 seconds. We believe this is because the average postscript delay is about 7 seconds (see details in Figure~\ref{fig:model_montage_queue_delay} ) and the average runtime is 1 second. The local scheduler spends about 8 seconds finding an available resource and executing a job; if there is no resource idle, it will wait another 8 seconds for the current running jobs to finish, and so on. 
 
@@ -185,22 +187,24 @@ The queue delay has three decreasing peak points at 8, 14, and 22 seconds. We be
 \end{figure}
 
 %In our prior work \cite{Overhead2011}, we have introduced the distribution of overheads and the relationship between them. Following this, we indicate the necessity to consider the distribution of overheads rather than simply adding a constant delay after job execution. 
-We use Workflow Engine Delay as an example to show the necessity to model overheads appropriately. Figure~\ref{fig:model_montage_timeline} shows a real trace of overheads and runtime in the Montage 8 degree workflow (for visibility issues, we only show the first 15 jobs at the mProjectPP level). We can see that Workflow Engine Delay increases steadily after every five jobs. For example, the Workflow Engine Delay of jobs with ID from 6 to 10 is approximately twice of that of jobs ranging from ID1 to ID5. Figure~\ref{fig:model_montage_one_run} further shows the distribution of Workflow Engine Delay of the first 20 jobs at the mProjectPP level in the Montage workflow. After every five jobs, the Workflow Engine Delay increases by 8 seconds approximately. We call this special nature of workflow overhead as cyclic increase. The reason is that Workflow Engine (in this trace it is DAGMan) releases five jobs by default in every working cycle. Therefore, simply adding a constant delay after every job execution has ignored its potential influence on the performance.
 
-\begin{figure}[h!]
-	\centering
-    \includegraphics[width=0.6\textwidth]{figures/model/overhead_timeline2.pdf}
-    \caption{Workflow Overhead and Runtime. Clustering delay and data transfer delay are not shown}
-    \label{fig:model_montage_timeline}
-\end{figure}
+%Since we do not use it in ftc and btc
+%We use Workflow Engine Delay as an example to show the necessity to model overheads appropriately. Figure~\ref{fig:model_montage_timeline} shows a real trace of overheads and runtime in the Montage 8 degree workflow (for visibility issues, we only show the first 15 jobs at the mProjectPP level). We can see that Workflow Engine Delay increases steadily after every five jobs. For example, the Workflow Engine Delay of jobs with ID from 6 to 10 is approximately twice of that of jobs ranging from ID1 to ID5. Figure~\ref{fig:model_montage_one_run} further shows the distribution of Workflow Engine Delay of the first 20 jobs at the mProjectPP level in the Montage workflow. After every five jobs, the Workflow Engine Delay increases by 8 seconds approximately. We call this special nature of workflow overhead as cyclic increase. The reason is that Workflow Engine (in this trace it is DAGMan) releases five jobs by default in every working cycle. Therefore, simply adding a constant delay after every job execution has ignored its potential influence on the performance.
+
+%\begin{figure}[h!]
+%	\centering
+%    \includegraphics[width=0.6\textwidth]{figures/model/overhead_timeline2.pdf}
+%    \caption{Workflow Overhead and Runtime. Clustering delay and data transfer delay are not shown}
+%    \label{fig:model_montage_timeline}
+%\end{figure}
 
 
-\begin{figure}
-\centering
-  \includegraphics[width=0.7\linewidth]{figures/model/montage_one_run.eps}
-    \caption{Workflow Engine Delay of mProjectPP}
-    \label{fig:model_montage_one_run}
-\end{figure}%
+%\begin{figure}
+%\centering
+%  \includegraphics[width=0.7\linewidth]{figures/model/montage_one_run.eps}
+%    \caption{Workflow Engine Delay of mProjectPP}
+%    \label{fig:model_montage_one_run}
+%\end{figure}%
 \begin{figure}
   \centering
   \includegraphics[width=0.7\linewidth]{figures/model/montage_clustering_delay.eps}
@@ -212,7 +216,7 @@ We use Workflow Engine Delay as an example to show the necessity to model overhe
 
 
 
-Figure~\ref{fig:model_montage_clustering} shows the average value of Clustering Delay of mProjectPP, mDiffFit, and mBackground. It is clear that with the increase of $clusters.num$ (the maximum number of jobs per horizontal level), since there are less and less tasks in a clustered job, the Clustering Delay for each job decreases. For simplicity, we use an inverse proportional model in Equation~\ref{eq:model_clustering_delay} to describe this trend of Clustering Delay with $clusters.num$. Intuitively we assume that the average delay per task in a clustered job is constant ($n$ is the number of tasks in a horizontal level). An inverse proportional model can estimate the delay when $clusters.num=i$ directly if we have known the delay when $clusters.num=j$. Therefore we can predict all the clustering cases as long as we have gathered one clustering case. 
+Figure~\ref{fig:model_montage_clustering} shows the average value of Clustering Delay of mProjectPP, mDiffFit, and mBackground. It is clear that with the increase of $clusters.num$ (the maximum number of jobs per horizontal level), since there are less and less tasks in a clustered job, the Clustering Delay for each job decreases. For simplicity, we use an inverse proportional model in Equation~\ref{eq:model_clustering_delay} to describe this trend of Clustering Delay with $clusters.num$. Intuitively we assume that the average delay per task in a clustered job is constant ($n$ is the number of tasks in a horizontal level). An inverse proportional model can estimate the delay when $clusters.num=i$ directly if we have known the delay when $clusters.num=j$. Therefore we can predict all the clustering cases as long as we have gathered one clustering case. This feature will be used to evaluate the performance of a workflow simulator in Section \ref{sec:experiments}. 
 
 \begin{equation} \label{eq:model_clustering_delay}
 \frac{Clustering Delay|_{clusters.num=i}}{Clustering Delay|_{clusters.num=j}}=\frac{n/i}{n/j}=\frac{j}{i}
