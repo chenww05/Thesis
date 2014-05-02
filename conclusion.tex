@@ -1,6 +1,6 @@
 \chapter{Conclusions}
 
-\section{Sum of Contributions}
+\section{Summary of Contributions}
 
 
 The main contribution of this thesis is a framework for task clustering and workflow partitioning in distributed systems. We have published 10 papers in several top conferences and 3 submitted journal papers. 
@@ -20,11 +20,11 @@ We have built an open source community for the users and developers of WorkflowS
 
 This thesis has demonstrated the necessity of optimizing task granularity in executing scientific workflows and has proposed and evaluated a series of innovative approaches to address this issue. Our work may inspire other researchers to continue work on this topic.  
 
-For example, in Chapter \ref{chap:partitioning}, we only consider data storage constraints while researchers may extend our work to further consider other resource constraints such as CPU, memory and bandwidth. 
+For example, in Chapter \ref{chap:partitioning}, we only consider data storage constraints while researchers may extend our work to further consider other resource constraints such as CPU, memory and bandwidth. We expect to see similar performance improvement over these resource constraints. 
 
-In Chapter \ref{chap:balance},  one may further analyze the imbalance metrics proposed. For instance, the values of these metrics presented in this chapter are not normalized, and thus their values per level (HIFV, HDV, and HRV) are in different scales. Also, one may analyze more workflow applications, particularly the ones with asymmetric structures, to investigate the relationship between workflow structures and the metric values. 
+In Chapter \ref{chap:balance},  one may further analyze the imbalance metrics proposed. For instance, the values of these metrics presented in this chapter are not normalized, and thus their values per level (HIFV, HDV, and HRV) are in different scales. Also, one may analyze more workflow applications, particularly the ones with asymmetric structures, to investigate the relationship between workflow structures and the metric values. We expect that these metrics can perform better with normalization. 
 
-Also, as shown in Figure~\ref{fig:evaluation_vc_genome}, \emph{VC-prior} can generate very large clustered jobs vertically and makes it difficult for horizontal methods to improve further. Therefore, researchers can develop imbalance metrics for \emph{VC-prior} to avoid generating large clustered jobs, i.e., based on the accumulated runtime of tasks in a pipeline. 
+Also, as shown in Figure~\ref{fig:evaluation_vc_genome}, \emph{VC-prior} can generate very large clustered jobs vertically and makes it difficult for horizontal methods to improve further. Therefore, researchers can develop imbalance metrics for \emph{VC-prior} to avoid generating large clustered jobs, i.e., based on the accumulated runtime of tasks in a pipeline. We expect to see better performance for \emph{VC-prior} with these new metrics. 
 
 
 As shown in our experiment results, the combination of our balancing methods with vertical clustering have different sensitivity to workflows with distinguished graph structures and runtime distribution. Therefore, a possible future work is the development of a portfolio clustering, which chooses multiple clustering algorithms, and dynamically selects most suitable one according to the dynamic load.
