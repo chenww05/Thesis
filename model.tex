@@ -1,38 +1,13 @@
-\chapter{Background}
+\chapter{Workflow and System Model}
 \label{chap:model}
 
-In this chapter, we first introduce how we extend the existing DAG model to be overhead aware and we also describe the system model that we use in this thesis. Second we present our overhead analysis on a series of widely used workflows, which is a base of our optimization methods that will be used in simulations. Third, we introduce the experiment environments used in this thesis including FutureGrid, a distributed platform and a workflow simulator as an example of the importance of an overhead model when simulating workflow execution. The simulation of a widely used workflow verifies the necessity of taking overheads into consideration. 
-\section{Workflow and System Model}
+In this chapter, we first introduce how we extend the existing DAG model to be overhead-aware and we also describe the system model that we use in this thesis. Second we present our overhead analysis on a series of widely used workflows, which is a base of our optimization methods that will be used in simulations. Third, we introduce the experiment environments used in this thesis including FutureGrid, a distributed platform and a workflow simulator as an example of the importance of an overhead model when simulating workflow execution. The simulation of a widely used workflow verifies the necessity of taking overheads into consideration.
 
-\begin{figure}[h!]
-\includegraphics[width=0.3\linewidth]{figures/model/dag.pdf}
-\centering
-  \captionof{figure}{Simple DAG with four tasks ($t_1, t_2, t_3, t_4$). The edges represent data dependencies between tasks. }
-  \label{fig:model_dag}
-\end{figure}
-
-Traditionally a workflow is modeled as a Directed Acyclic Graph (DAG). As shown in Figure~\ref{fig:model_dag}, each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. 
- The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. 
-A job ($j$) is a single execution unit and it contains one or multiple task(s). The process of merging tasks into a clustered job is called task clustering. We will introduce the modeling of task clustering in Section~\ref{sec:task_clustering}. 
-
-Workflows are typically prepared and executed in a Workflow Management System such as Pegasus \cite{Deelman2004}, ASKALON \cite{Ostermann2009b} and Taverna \cite{Calasanz2008}. The components of a WMS are listed below: 
-
-\begin{figure}[h!]
-\centering
-  \includegraphics[width=0.7\linewidth]{figures/model/model.pdf}
-
-  \caption{System Model}
-  \label{fig:model_system}
-\end{figure}
-
-\textbf{Workflow Mapper} generates an executable workflow based on an abstract workflow provided by a user or a workflow composition system. 
-\textbf{Workflow Engine} executes the jobs defined by the workflow in order of their dependencies. Only free jobs that have all their parent jobs completed are submitted to  Job Scheduler. 
-\textbf{Job Scheduler} and \textbf{Local Queue} manage individual workflow jobs and supervise their execution on local and remote resources.
-\textbf{Job Wrapper} extracts tasks from clustered jobs and executes them at the worker nodes. 
+\section{Overhead-aware DAG Model}
 
 A DAG models the computational activities and data dependencies within a workflow and it fits with most workflow management systems such as Pegasus \cite{Deelman2004} and DAGMan \cite{Kalayci2010}. However, the preparation and execution of a scientific workflow in distributed environments often involve multiple components and the system overheads within and between these components cannot be ignored. 
 An overhead is defined as the time of performing miscellaneous work other than executing computational activities. 
-To address this challenge, in this section, we extend the existing Directed Acyclic Graph (DAG) model to be overhead aware (o-DAG), in which an overhead is also a node in the DAG and the control dependencies are added as directed edges. We utilize o-DAG to provide a systematic analysis of the performance of workflow optimization methods and provide a series of novel optimization methods to further improve the overall workflow performance. 
+To address this challenge, in this thesis, we extend the existing Directed Acyclic Graph (DAG) model to be overhead-aware (o-DAG), in which an overhead is also a node in the DAG and the control dependencies are added as directed edges. We utilize o-DAG to provide a systematic analysis of the performance of workflow optimization methods and provide a series of novel optimization methods to further improve the overall workflow performance. 
 
 
 %????
@@ -47,7 +22,7 @@ To address this challenge, in this section, we extend the existing Directed Acyc
   \label{fig:model_odag}
 \end{figure}
 
-%In this work, we extend the DAG model to be overhead aware (o-DAG). The reason is that system overheads play an important role in workflow execution and they constitute a major part of the overall runtime when tasks are poorly clustered. 
+%In this work, we extend the DAG model to be overhead-aware (o-DAG). The reason is that system overheads play an important role in workflow execution and they constitute a major part of the overall runtime when tasks are poorly clustered. 
 Fig~\ref{fig:model_odag} shows how we augment a DAG to be an o-DAG with the capability to represent scheduling overheads ($s$) such as workflow engine delay, queue delay, and postscript delay. The classification of overheads is based on the model of a typical workflow management system shown in Fig~\ref{fig:model_system} and will be introduced in Section \ref{sec:overheads}. 
 
 
@@ -74,6 +49,9 @@ Fig~\ref{fig:model_odag} shows how we augment a DAG to be an o-DAG with the capa
 
 %With o-DAG model, we can explicitly express the process of task clustering. For example, in Fig~\ref{fig:intro_hc}, two tasks $t_2$ and $t_3$ without data dependency between them are merged into a clustered job $j_1$. Scheduling overheads ($s_3$) are reduced but clustering delay ($c_1$) is added. 
 
+%A job ($j$) is a single execution unit and it contains one or multiple task(s). The process of merging tasks into a clustered job is called \textbf{task clustering}. 
+
+
 With an o-DAG model, we can explicitly express the process of task clustering. In this thesis, we address task clustering horizontally and vertically. \textbf{Horizontal Clustering} (HC) merges multiple tasks that are at the same horizontal level of the workflow, in which the horizontal level of a task is defined as the longest distance from the entry task of the DAG to this task. \textbf{Vertical Clustering} (VC) merges tasks within a pipeline of the workflow. Tasks at the same pipeline share a single-parent-single-child relationship, which means a task $t_a$ is the unique parent of a task $t_b$, which is the unique child of $t_a$. 
 
 
@@ -85,50 +63,7 @@ Figure~\ref{fig:model_vc} illustrates an example of vertical clustering, in whic
 
 
 
-
-%\section{Related Work}
-
-%The Directed Acyclic Graph (DAG) has been widely used in many workflow management systems such as DAGMan \cite{DAGMan}, Pegasus \cite{Deelman2004}, Triana \cite{Taylor2006}, DAGuE \cite{Bosilca2011} and GrADS \cite{Cooper2004} . Each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks that constrain the order in which the tasks are executed.  The Directed Acyclic Graph Manager (DAG-Man) \cite{DAGMan} is a service provided by Condor \cite{Frey2002} for executing multiple jobs with dependencies. The DAGMan meta-scheduler processes the DAG dynamically, by sending to the Condor scheduler the jobs as soon as their dependencies are satisfied and they become ready to execute. DAGMan can also help with the resubmission of uncompleted portions of a DAG when one or more nodes resulted in failure, which is called job retry. Pegasus \cite{Deelman2004}, which stands for Planning for Execution in Grids, was developed at the USC Information Sciences Institute as part of the GriPhyN \cite{Deelman2002} and SCEC/IT \cite{Maechling2007} projects. Pegasus receives an abstract workflow description in a XML format from users, produces a concrete or executable workflow, and submits it to DAGMan for execution. 
-
-%A Petri net is a directed bipartite graph, in which the nodes represent transitions and places. The directed arcs describe which places are pre- and/or postconditions for which transitions occurs. Ordinary Petri nets and their extensions have been widely used for the specification, analysis and implementation of workflows \cite{Aalst1998}. Petri nets also enable powerful analysis techniques, which can be used to verify the correctness of workﬂow procedures. In the scientific workflow community, Petri nets have also been utilized and GWorkflowDL \cite{Vossberg2008}, Grid-Flow \cite{Guan2004} and FlowManager \cite{Aversano2002} are representative examples of this. 
-
-%ASKALON \cite{Fahringer2005} is a Grid environment for composition and execution of scientific workflow applications and uses the standard Web Services Description Language (WSDL) to model workflows. WSDL is an XML format for describing network services as a set of endpoints operating on messages containing either document-oriented or procedure-oriented information. The operations and messages are described abstractly, and then bound to a concrete network protocol and message format to define an endpoint. In ASKALON, the scheduler optimizes the workflow performance using the execution time as the most important goal function. The scheduler interacts with the enactment engine, which is a service that supervises the reliable and fault tolerant execution of the tasks and the transfer of files. 
- 
-%Compared to these approaches, we extend the original DAG model to be overhead aware so as to analyze the performance of task clustering. An overhead \cite{Prodan2008, Prodan2007} is defined as the time of performing miscellaneous work other than executing the user’s computational activities. In our overhead-aware DAG model (o-DAG), a node can represent either a computational task/job or system overhead during the runtime. A directed edge can represent either a data dependencies between computational tasks/jobs or a control dependency between overheads and computations. Such an extension of the DAG model provides us the ability to model the process of task clustering and analyze the runtime performance of different task clustering strategies. 
-
-%Overheads play an important role in distributed systems. Stratan et al. \cite{Stratan2008} evaluates workflow engines including DAGMan/Condor and Karajan/Globus in a real-world grid environment. Their methodology focuses on five system characteristics: the overhead, the raw performance, the stability, the scalability and the reliability. They have pointed out that head node consumption should not be negligible and the main bottleneck in a busy system is often the head node. Prodan et al. \cite{Prodan2008} offers a complete grid workflow overhead classification and a systematic measurement of overheads. Östberg et al. \cite{Östberg2011} used the Grid Job Management Framework (GJMF) as a testbed for characterization of Grid Service-Oriented Architecture overhead, and evaluate the efficiency of a set of design patterns for overhead mediation mechanisms featured in the framework. In comparison with their work, (1) we focus on measuring the overlap of major overheads imposed by workflow management systems and execution environments; (2) we present a study of the distribution of overheads instead of just overall numbers; (3) we compare workflows running in different platforms (dedicated clusters, clouds, grids) and different environments (resource availability, file systems), explaining how they influence the resulting overheads; and (4) we analyze how existing optimization techniques improve the workflow runtime by reducing or overlapping overheads.
-
-
-%Fragmentation \cite{Rodríguez2012} is a well known effect in resource allocation, which decreases the resource utilization, as studied in \cite{Smith2000}. Whenever a resource allocation fails, even though enough free capacity is available, fragmentation is easily spotted as cause. In \cite{Gehr2009}, a new way for measuring the fragmentation of a system, as well as their correlation with jobs rejection, is presented. It shows that the proposed fragmentation measure is a good indicator of the state of the system. In this work, we are also interested in the resource under-utilization problem and we use a few cumulative metrics to measure the fragmentation. 
-
-
-%Performance Analysis of scientific workflows has also been studied in \cite{Rubing2009, Calasanz2008, Truong2004, Uysal1998}. The performance method proposed by Duan et al. \cite{Rubing2009} is based on a hybrid Bayesian-neural network for predicting the execution time of workflow tasks. Bayesian network is a graphical modeling approach that we use to model the effects of different factors affecting the execution time (referred as factors or variables), and the interdependence of the factors among each other. The important attributes are dynamically selected by the Bayesian network and fed into a radial basis function neural network to make further predictions. In comparison, our work in overhead analysis focuses on the relationship between system overheads and the performance of different optimization methods. We investigated a wide range of scientific workflows and analyzed how system overheads influence the performance of optimization of these workflows. 
-
-
-%Because in Grid systems communication delays are significant all algorithms must achieve maximum parallelism while minimizing data communication. 
-
-%Task Clustering reduces the communication cost and scheduling overheads by grouping the heavily communicating tasks or short runtime tasks to the same job and then assigning the job in a cluster to the same resources. 
-%Task clustering algorithms can have two phases: the initial task clustering and a post-clustering phase which can refine the clusters produced in the previous phase. Our work has covered both phases. 
-
-%The low performance of lightweight (a.k.a. fine-grained) tasks is a common problem on widely distributed platforms where the communication overheads and scheduling overheads are high, such as grid systems. To address this issue, fine-grained tasks are commonly merged into coarse-grained tasks \cite{Muthuvelu2005, Muthuvelu2013, Keat2006}, which reduces the cost of data transfers when grouped tasks share input data \cite{Muthuvelu2005} and saves scheduling overheads such as queueing time when resources are limited. However, task grouping also limits parallelism and therefore should be used carefully. Muthuvelu et al. \cite{Muthuvelu2013} proposed an algorithm to group bag of tasks based on their granularity size defined as the processing time of the task on the resource. Resources are ordered by their decreasing values of capacity (in MIPS) and tasks are grouped up to the resource capacity. Then, Keat et al. \cite{Keat2006} and Ang et al. \cite{Ang2009} extended the work of Muthuvelu et al. by introducing bandwidth to enhance the performance of task clustering. Resources are sorted in descending order of bandwidth, then assigned to grouped tasks downward ordered by processing requirement length. Afterwards, Soni et al. \cite{Soni2010} proposed an algorithm to group lightweight tasks into coarse-grained tasks (GBJS) based on processing capability, bandwidth, and memory-size of the available resources. Tasks are sorted into ascending order of required computational power, then, selected in first come first serve order to be grouped according to the capability of the resources. Zomaya and Chan \cite{Zomaya2004} studied limitations and ideal control parameters of task clustering by using genetic algorithm. Their algorithm performs task selection based on the earliest task start time and task communication costs; it converges to an optimal solution of the number of clustered jobs and tasks per clustered job. In contrast, our work has discussed the influence of data dependencies across different levels while they only focus on computational activities (bag-of-tasks). 
-
-
-%Singh \cite{Singh2008} proposed to use horizontal clustering and label based clustering in scientific workflows to reduce the scheduling overheads in a best-effort approach. The horizontal clustering merges tasks at the same level, while level of a task refers to the distance from a root task to this task using Breadth-First-Search. Label based clustering uses labels set by the users manually and merges tasks with the same labels together. Task clustering strategies have demonstrated their effect in some scientific workflows \cite{Rynge2012, Maheshwari2012, Hussin2010, Liu2009}.  Li \cite{Li2011}  developed algorithm that uses horizontal clustering to group tasks that can be scheduled to run simultaneously. Tasks with the same scheduling priority (determined by the scheduling level) are merged and scheduled to run simultaneously. Cao et al. \cite{Cao2008} proposed a static scheduling heuristic, called DAGMap that consists of three phases, namely prioritizing, grouping, and independent task scheduling. Task grouping is based on dependency relationships and task upward priority (the longest distance form this task to the exit task). Compared to their work, we propose a generic workflow model that takes system overheads into consideration and provide a series of overhead aware task clustering strategies to optimize the overall runtime performance of workflows. 
-
-%Task clustering is one typical category of task scheduling, which maps resources to tasks based on different criteria. List Heuristics assign a priority to a task and the scheduling algorithms attempt to execute the higher priority nodes first. Most scheduling algorithms for Grid systems are based on this approach. For example, scheduling algorithms, such as HEFT \cite{Topcuoglu2002}, MaxMin \cite{Braun2001}, MinMin \cite{Blythe2005}, etc., have been widely used in optimizing the runtime performance of many scientific workflows. Genetic Algorithms \cite{Adamuthe2011} and Neural Network \cite{Babu2012} are also proposed to address the scheduling problem. Compared to them, we aim to generate a group of tasks that are suitable for scheduling and execution while the resource selection is not our major challenge since we already have many mature scheduling algorithms. 
-
-
-
-
-%Pandey et al. (2009) used task clustering to schedule data-intensive tasks for a medical application workflow. They clustered tasks based on their execution time, data transfer and level. If tasks were having high deviation and value of average execution time, they were executed without clustering. Tasks with lower deviation and value of execution time were clustered together. They showed that clustering tasks for data-intensive application workflows has better makespan than scheduling the workflow without clustering, mainly attributed to the decrease in file transfers between tasks in the same cluster.
-
-
-
-
-
-
-
-\section{Workflow Overheads}
+\section{System Overheads}
 \label{sec:overheads}
 \subsection{Overhead Classification}
 
