@@ -10,23 +10,23 @@ A \textbf{workflow} is a high-level specification of a set of tasks needed to ma
 \includegraphics[width=0.3\linewidth]{figures/model/dag.pdf}
 \centering
   \captionof{figure}{Simple DAG with four tasks ($t_1, t_2, t_3, t_4$). The edges represent data dependencies between tasks. }
-  \label{fig:model_dag}
+  \label{fig:intro_dag}
 \end{figure}
 
 %rewrite
-Traditionally, a workflow is modeled as a Directed Acyclic Graph (DAG). As shown in Figure~\ref{fig:model_dag}, each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. 
+Traditionally, a workflow is modeled as a Directed Acyclic Graph (DAG). As shown in Figure~\ref{fig:intro_dag}, each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. 
 
 Scientific workflows increasingly require tremendous amounts of data processing and workflows with up to a few million tasks are not uncommon \cite{Callaghan2011}. For example, the CyberShake workflow \cite{Rynge2012} composed of more than 800,000 jobs have been executed on the TeraGrid \cite{TeraGrid}. Among these large-scale, loosely-coupled applications, the majority of the tasks within these applications are often relatively small (from a few seconds to a few minutes in runtime). However, in aggregate they represent a significant amount of computation and data \cite{Deelman2002}. Most existing systems considered the allocation of computation resources and the scheduling of tasks, but did not effectively take into account the refinement of workflow structures, system overheads, and failure occurrence.
 An \textbf{overhead} is defined as the time of performing miscellaneous work other than executing the user's computational activities. Overheads adversely influence runtime of large-scale scientific workflows and cause significant resource underutilization \cite{Chen2011}. 
 
 In order to minimize the impact of system overheads, workflow restructuring techniques such as task clustering \cite{Singh2008,Hussin2010,Zhao2009} and workflow partitioning \cite{Kumar2002, Hedayat2009} have been developed to increase their computational granularity and thereby reduce the system overheads. \textbf{Task clustering}~\cite{Singh2008} is a technique that merges small tasks into larger jobs so that the number of computational activities is reduced and the ratio of application computation to the system overheads is increased. A \textbf{job} is a single execution unit in a workflow management system such as Pegasus \cite{Deelman2004}, Askalon \cite{Ostermann2009b} and Taverna \cite{Calasanz2008}. 
-Figure~\ref{fig:model_system} shows a typical execution environment for scientific workflows. The components of this environment are listed below: 
+Figure~\ref{fig:intro_system} shows a typical execution environment for scientific workflows. The components of this environment are listed below: 
 
 \begin{figure}[h!]
 \centering
   \includegraphics[width=0.7\linewidth]{figures/model/model.pdf}
   \caption{System Model}
-  \label{fig:model_system}
+  \label{fig:intro_system}
 \end{figure}
 \textbf{Workflow Mapper} generates an executable workflow based on an abstract workflow provided by a user or a workflow composition system. 
 \textbf{Workflow Engine} executes the jobs defined by the workflow in order of their dependencies. Only free jobs that have all their parent jobs completed are submitted to  Job Scheduler. 
