@@ -79,15 +79,15 @@ Similarly, if we model the system overhead $\bm s$ with a Gamma distribution wit
 $\bm M$ is also a random variable and it includes the system overheads and the runtime of the clustered job and its subsequent retry jobs if the first try fails. We also assume the task failures are independent in each worker node (but with the same distribution) without considering the failures that brings the whole system down such as a failure in the shared file system. 
 %since that is not the concern of task clustering but the task scheduling. 
 
-The runtime of a job is a random variable indicated by $\bm d$. A clustered job succeeds only if all of its tasks succeed. The job runtime is the sum of the cumulative task runtime of $k$ tasks and a system overhead. We assume the task runtime of each task is independent of each other, therefore the cumulative task runtime of $k$ tasks is also a Gamma distribution since the sum of Gamma distributions with the same shape parameter is still a Gamma distribution. We also assume the system overhead is independent of all the task runtimes and it has the same shape parameter ($\phi_{ts}=\phi_{t}=\phi_{s}$) with the task runtime. 
+The runtime of a job is a random variable indicated by $\bm d$. A clustered job succeeds only if all of its tasks succeed. The job runtime is the sum of the cumulative task runtime of $k$ tasks and a system overhead. We assume the task runtime of each task is independent of each other, therefore the cumulative task runtime of $k$ tasks is also a Gamma distribution since the sum of Gamma distributions with the same scale parameter is still a Gamma distribution. We also assume the system overhead is independent of all the task runtimes and it has the same scale parameter ($\theta_{ts}=\theta_{t}=\theta_{s}$) with the task runtime. In practice, if the task runtime and the system overhead have different scale parameters, we can always normalize them. For a Gamma distribution $X\sim\Gamma(\phi,\theta)$ we have $cX\sim\Gamma(\phi, c\theta)$. 
 %Don't know how to explain
 %In practice, this assumption means the cumulative task runtime and the system overhead are generated at the same rate (or scale). 
 %which is consistent with our o-DAG model that has one system overhead associated to one job. 
 The job runtime irrespective of whether it succeeds or fails is:
 \begin{eqnarray}
 \displaystyle
-\bm{d}\sim\Gamma(\phi_{ts}, k\theta_t+\theta_s)\\
-MLE(\bm{d})=\displaystyle{(k\theta_t+\theta_s) }{(\phi_{ts}-1)}
+\bm{d}\sim\Gamma(k\phi_{t}+\phi_{s}, \theta_{ts})\\
+MLE(\bm{d})=\displaystyle{(k\phi_t+\phi_s - 1) }{\theta_{ts}}
 \label{eq:N}
 \end{eqnarray}
 %We assume that $n \gg r$, but $n/k$ is not necessarily much larger than $r$ since $k$ could be very large. Normally at the beginning of workflow execution, $n/k > r$, which means there are more clustered jobs than available resources. To try all $n$ tasks once, irrespective of whether they succeed or fail, one needs approximately $\displaystyle \frac{n}{rk}$ execution cycle(s) since at each execution cycle we can execute at most $r$ jobs. Therefore, 
