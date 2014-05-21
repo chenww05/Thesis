@@ -3,6 +3,86 @@
 
 In this chapter, we first introduce how we extend the existing DAG model to be overhead-aware and we also describe the system model that we use in this thesis. Second we present our overhead analysis on a series of widely used workflows, which is a base of our optimization methods that will be used in simulations. Third, we introduce the experiment environments used in this thesis including FutureGrid, a distributed platform and a workflow simulator as an example of the importance of an overhead model when simulating workflow execution. The simulation of a widely used workflow verifies the necessity of taking overheads into consideration.
 
+\section{Scientific Workflow Applications}
+\label{sec:applications}
+
+Five widely used scientific workflow applications are used in this thesis: LIGO Inspiral analysis~\cite{LIGO}, Montage~\cite{Berriman2004}, CyberShake~\cite{Graves2010}, Epigenomics~\cite{Epigenome}, and SIPHT~\cite{SIPHT}. In this section, we describe each workflow application and present their main characteristics and structures. For simplicity, system overheads are not displayed.
+
+\paragraph{\textbf{LIGO}}
+\begin{figure*}[!htb]
+	\centering
+	\includegraphics[width=0.45\linewidth]{figures/workflowsim/ligo_shape.pdf} \\
+	\caption{A simplified visualization of the LIGO Inspiral workflow.}
+	\label{fig:model_shape_ligo}
+\end{figure*}
+Laser Interferometer Gravitational Wave Observatory (LIGO)~\cite{LIGO} workflows are used to search for gravitational wave signatures in data collected by large-scale interferometers. The observatories' mission is to detect and measure gravitational waves predicted by general relativity (Einstein's theory of gravity), in which gravity is described as due to the curvature of the fabric of time and space. The LIGO Inspiral workflow is a data-intensive workflow. Figure~\ref{fig:model_shape_ligo} shows a simplified version of this workflow. The LIGO Inspiral workflow is separated into multiple groups of interconnected tasks, which we call branches in this thesis. However, each branch may have a different number of pipelines as shown in Figure~\ref{fig:model_shape_ligo}. 
+
+\begin{figure*}[htb]
+	\centering
+	\includegraphics[width=0.4\linewidth]{figures/workflowsim/montage_shape.pdf} \\
+	\caption{A simplified visualization of the Montage workflow.}
+	\label{fig:model_shape_montage}
+\end{figure*}
+
+\paragraph{\textbf{Montage}}
+Montage~\cite{Berriman2004} is an astronomy application that is used to construct large image mosaics of the sky. Input images are reprojected onto a sphere and overlap is calculated for each input image. The application reprojects input images to the correct orientation while keeping background emission level constant in all images. The images are added by rectifying them to a common flux scale and background level. Finally the reprojected images are co-added into a final mosaic. The resulting mosaic image can provide a much deeper and detailed understanding of the portion of the sky in question. Figure~\ref{fig:model_shape_montage} illustrates a small Montage workflow. The size of the workflow depends on the number of images used in constructing the desired mosaic of the sky. 
+
+\begin{figure*}[htb]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/workflowsim/cybershake_shape.pdf} \\
+	\caption{A simplified visualization of the CyberShake workflow.}
+	\label{fig:model_shape_cybershake}
+\end{figure*}
+
+\paragraph{\textbf{Cybershake}}
+CyberShake~\cite{Graves2010} is a seismology application that calculates Probabilistic Seismic Hazard curves for geographic sites in the Southern California region. It identifies all ruptures within 200km of the site of interest and converts rupture definition into multiple rupture variations with differing hypocenter locations and slip distributions. It then calculates synthetic seismograms for each rupture variance, and peak intensity measures are then extracted from these synthetics and combined with the original rupture probabilities to produce probabilistic seismic hazard curves for the site. Figure~\ref{fig:model_shape_cybershake} shows an illustration of the Cybershake workflow.
+
+\begin{figure*}[htb]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/workflowsim/genome_shape.pdf} \\
+	\caption{A simplified visualization of the Epigenomics workflow with multiple branches.}
+	\label{fig:model_shape_genome}
+\end{figure*}
+
+\paragraph{\textbf{Epigenomics}}
+The Epigenomics workflow~\cite{Epigenome} is a CPU-intensive application. Initial data are acquired from the Illumina-Solexa Genetic Analyzer in the form of DNA sequence lanes. Each Solexa machine can generate multiple lanes of DNA sequences. Then the workflow maps DNA sequences to the correct locations in a reference Genome. This generates a map that displays the sequence density showing how many times a certain sequence expresses itself on a particular location on the reference genome. A simplified structure of Epigenomics is shown in Figure~\ref{fig:model_shape_genome}. 
+%Different to the LIGO Inspiral workflow, each branch in Epigenomics has exactly the same number of pipelines, which makes it more symmetric. 
+
+\begin{figure*}[htb]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/workflowsim/sipht_shape.pdf} \\
+	\caption{A simplified visualization of the SIPHT workflow.}
+	\label{fig:model_shape_sipht}
+\end{figure*}
+
+\paragraph{\textbf{SIPHT}}
+The SIPHT workflow~\cite{SIPHT} conducts a wide search for small untranslated RNAs (sRNAs) that regulates several processes such as secretion or virulence in bacteria. The kingdom-wide prediction and annotation of sRNA encoding genes involves a variety of individual programs that are executed in the proper order using Pegasus~\cite{Deelman2004}. These involve the prediction of $\rho$-independent transcriptional terminators, BLAST (Basic Local Alignment Search Tools~\cite{BLAST}) comparisons of the inter genetic regions of different replicons and the annotations of any sRNAs that are found. A simplified structure of the SIPHT workflow is shown in Figure~\ref{fig:model_shape_sipht}. 
+
+
+
+
+\begin{table}[!htb]
+	\setlength{\tabcolsep}{11pt}
+	\centering
+	\small
+	\begin{tabular}{lrrrr}
+		\hline
+		 & \multicolumn{1}{c}{Number} & \multicolumn{1}{c}{Average} &  \multicolumn{1}{c}{Average} \\
+		Workflow	& of Tasks	 & Data Size & Task Runtime \\
+		\hline
+		LIGO 		&800		& 5 MB	& 228s\\
+		Montage 		&300		&3 MB	&11s\\
+		CyberShake 	&700		&148 MB 	& 23s\\
+		Epigenomics 	&165 	& 355 MB	& 2952s\\
+		SIPHT		&1000	& 360 KB 	& 180s\\
+		\hline
+	\end{tabular}
+	\caption{Summary of the scientific workflows characteristics.}
+	\label{tab:model_workflows}
+\end{table} 
+
+Table~\ref{tab:model_workflows} shows the summary of the main \textbf{workflow characteristics}: number of tasks, average data size, and average task runtimes for the five workflows. 
+
 \section{Overhead-aware DAG Model}
 
 A DAG models the computational activities and data dependencies within a workflow and it fits with most workflow management systems such as Pegasus \cite{Deelman2004} and DAGMan \cite{Kalayci2010}. However, the preparation and execution of a scientific workflow in distributed environments often involve multiple components and the system overheads within and between these components cannot be ignored. 
