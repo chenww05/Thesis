@@ -1,0 +1,217 @@
+\chapter{Background}
+
+In this chapter, we introduce the background knowledge and  our observed data about a wide range of scientific workflows used in this thesis. First, we introduce a widely used workflow and system model, which is the basis of our proposed model that will be introduced in next chapter. Second, we introduce the classification and distribution of system overheads during the workflow executions. Third, we describe the scientific workflow applications used in this thesis. 
+
+\section{Workflow and System Model}
+
+
+\begin{figure}[h!]
+\includegraphics[width=0.3\linewidth]{figures/model/dag.pdf}
+\centering
+  \captionof{figure}{A simple DAG with four tasks ($t_1, t_2, t_3, t_4$). The edges represent data dependencies between tasks. }
+  \label{fig:intro_dag}
+\end{figure}
+
+%rewrite
+A workflow is usually modeled as a Directed Acyclic Graph (DAG). As shown in Figure~\ref{fig:intro_dag}, each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. 
+
+Scientific workflows increasingly require tremendous amounts of data processing and workflows with up to a million tasks are not uncommon \cite{Callaghan2011}. For example, the CyberShake workflow \cite{Rynge2012} composed of more than 800,000 jobs have been executed on the TeraGrid \cite{TeraGrid}. Among these large-scale, loosely-coupled applications, the majority of the tasks within these applications are often relatively small (from a few seconds to a few minutes in runtime). However, in aggregate they represent a significant amount of computation and data \cite{Deelman2002}. Most existing systems consider the allocation of computation resources and the scheduling of tasks, but do not effectively take into account system overheads, failure occurrence, or the possibility to restructure the workflow.
+An \textbf{overhead} is defined as the time of performing miscellaneous work other than executing the user's computational activities. Overheads adversely influence runtime of large-scale scientific workflows and cause significant resource underutilization \cite{Chen2011}. 
+
+In order to minimize the impact of system overheads, workflow restructuring techniques such as task clustering \cite{Singh2008,Hussin2010,Zhao2009} and workflow partitioning \cite{Kumar2002, Hedayat2009} have been developed to reduce the system overheads and improve their scalability. \textbf{Task clustering}~\cite{Singh2008} is a technique that merges small tasks into larger jobs so that the number of computational activities is reduced and the ratio of application computation to the system overheads is increased. A \textbf{job} is a single execution unit in a workflow management system such as Pegasus \cite{Deelman2004}, Askalon \cite{Ostermann2009b} and Taverna \cite{Calasanz2008}. 
+Figure~\ref{fig:intro_system} shows a typical execution environment for scientific workflows. The components of this environment are listed below: 
+
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.7\linewidth]{figures/model/model.pdf}
+  \caption{System Model}
+  \label{fig:intro_system}
+\end{figure}
+\textbf{Workflow Mapper} generates an executable workflow based on an abstract workflow provided by a user or a workflow composition system. 
+\textbf{Workflow Engine} executes the jobs defined by the workflow in order of their dependencies. Only free jobs that have all their parent jobs completed are submitted to  Job Scheduler. 
+\textbf{Job Scheduler} and \textbf{Local Queue} manage individual workflow jobs and supervise their execution on local and remote resources.
+\textbf{Job Wrapper} extracts tasks from clustered jobs and executes them at the worker nodes. 
+
+%Task clustering has been widely used in executing such large-scale scientific workflows and has demonstrated its great effort \cite{Singh2008}. 
+
+
+\section{System Overheads}
+\label{sec:overheads}
+\subsection{Overhead Classification}
+
+
+\begin{figure}[h!]
+	\centering
+    \includegraphics[width=0.7\textwidth]{figures/model/Job_Timeline.pdf}
+    \caption{Workflow Events}
+    \label{fig:model_overhead}
+\end{figure}
+
+
+The execution of a job is comprised of a series of events as shown in Figure~\ref{fig:model_overhead} and they are defined as:
+\begin{enumerate}\item Job Release is defined as the time when the workflow engine identifies that a job is ready to be submitted (when its parents have successfully completed). \item Job Submit is defined as the time when the workflow engine submits a job to the local queue. \item Job Execute is defined as the time when the workflow engine sees a job is being executed. 
+\item Task Execute is defined as the time when the job wrapper sees a task is being executed. \item Postscript Start is defined as the time when the workflow engine starts to execute a postscript. \item Postscript Terminate is defined as the time when the postscript returns a status code (success or failure). \end{enumerate}
+Figure~\ref{fig:model_overhead} shows a typical timeline of overheads and runtime in a job. We do not specify the data transfer delay in this timeline because data transfer is handled by data transfer jobs (stage-in and stage-out jobs). 
+
+We have classified workflow overheads into five categories as follows. 
+\begin{enumerate}
+\item{Workflow Engine Delay} measures the time between when the last parent job of a job completes and the time when the job gets submitted to the local queue. 
+%In case of retries the value of the last retry is used for the calculation. 
+The completion time of the last parent job means this job is released to the ready queue and is waiting for resources to be assigned to it. The workflow engine delay reflects the efficiency of a workflow engine (i.e., DAGMan \cite{DAGMan}). 
+\item{Queue Delay} is defined as the time between the submission of a job by the workflow engine to the local queue and the time the local scheduler sees the job running. This overhead reflects the efficiency of the local workflow scheduler (e.g. Condor \cite{Frey2002}) to execute a job and the availability of resources for the execution of this job. 
+%The queue delay is an estimate of the time spent in the local queue on the submit host. 
+\item{Postscript Delay} is the time taken to execute a lightweight script under some execution systems after the execution of a job. Postscripts examine the status code of a job after the computational part of this job is done.
+\item{Data Transfer Delay} happens when data is transferred between nodes. It includes three different types of processes: staging data in, cleaning up, and staging data out. Stage-in jobs transfer input files from source sites to execution sites before the computation starts. Cleanup jobs delete intermediate data that is no longer needed by the remainder of the workflow. Stage-out jobs transfer workflow output data to archiving sites for storage and analysis.
+\item{Clustering Delay} measures the difference between the sum of the actual task runtime and the job runtime seen by the job wrapper. The cause of Clustering Delay is usually because we use a job wrapper in worker nodes to execute a clustered job that requires some delay to extract the list of tasks. 
+\end{enumerate}
+
+\subsection{Overhead Distribution}
+
+We examined the overhead distributions of a widely used astronomy workflow called Montage \cite{Berriman2004} that is used to construct large image mosaics of the sky. Montage was run on FutureGrid \cite{Fox2013FutureGrid}. The details of FutureGrid will be introduced in Section \ref{sec:experiments}. 
+Figure~\ref{fig:model_montage_queue_delay}, \ref{fig:model_montage_engine_delay} and \ref{fig:model_montage_postscript_delay} show the overhead distribution of the Montage workflow run on the FutureGrid. The postscript delay concentrates at 7 seconds, because the postscript is only used to locally check the return status of a job and is not influenced by the remote execution environment. The workflow engine delay tends to have a uniform distribution, which is because the workflow engine spends a constant amount of time to identify that the parent jobs have completed and insert a job that is ready at the end of the local queue. 
+The queue delay has three decreasing peak points at 8, 14, and 22 seconds. We believe this is because the average postscript delay is about 7 seconds (see details in Figure~\ref{fig:model_montage_queue_delay} ) and the average runtime is 1 second. The local scheduler spends about 8 seconds finding an available resource and executing a job; if there is no resource idle, it will wait another 8 seconds for the current running jobs to finish, and so on. 
+
+
+\begin{figure}[h!]
+	\centering
+    \includegraphics[height=0.4\textwidth]{figures/model/workflow_engine_delay.eps}
+    \caption{Distribution of Workflow Engine Delay in the Montage workflow}
+    \label{fig:model_montage_engine_delay}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+\includegraphics[height=0.4\textwidth]{figures/model/queue_delay.eps}
+    \caption{Distribution of Queue Delay in the Montage workflow}
+    \label{fig:model_montage_queue_delay}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+\includegraphics[width=0.7\textwidth]{figures/model/postscript_delay.eps}
+    \caption{Distribution of Postscript Delay in the Montage workflow}
+    \label{fig:model_montage_postscript_delay}
+\end{figure}
+
+%In our prior work \cite{Overhead2011}, we have introduced the distribution of overheads and the relationship between them. Following this, we indicate the necessity to consider the distribution of overheads rather than simply adding a constant delay after job execution. 
+
+%Since we do not use it in ftc and btc
+%We use Workflow Engine Delay as an example to show the necessity to model overheads appropriately. Figure~\ref{fig:model_montage_timeline} shows a real trace of overheads and runtime in the Montage 8 degree workflow (for visibility issues, we only show the first 15 jobs at the mProjectPP level). We can see that Workflow Engine Delay increases steadily after every five jobs. For example, the Workflow Engine Delay of jobs with ID from 6 to 10 is approximately twice of that of jobs ranging from ID1 to ID5. Figure~\ref{fig:model_montage_one_run} further shows the distribution of Workflow Engine Delay of the first 20 jobs at the mProjectPP level in the Montage workflow. After every five jobs, the Workflow Engine Delay increases by 8 seconds approximately. We call this special nature of workflow overhead as cyclic increase. The reason is that Workflow Engine (in this trace it is DAGMan) releases five jobs by default in every working cycle. Therefore, simply adding a constant delay after every job execution has ignored its potential influence on the performance.
+
+%\begin{figure}[h!]
+%	\centering
+%    \includegraphics[width=0.6\textwidth]{figures/model/overhead_timeline2.pdf}
+%    \caption{Workflow Overhead and Runtime. Clustering delay and data transfer delay are not shown}
+%    \label{fig:model_montage_timeline}
+%\end{figure}
+
+
+%\begin{figure}
+%\centering
+%  \includegraphics[width=0.7\linewidth]{figures/model/montage_one_run.eps}
+%    \caption{Workflow Engine Delay of mProjectPP}
+%    \label{fig:model_montage_one_run}
+%\end{figure}%
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\linewidth]{figures/model/montage_clustering_delay.eps}
+    \caption{Clustering Delay of mProjectPP, mDiffFit, and mBackground}
+    \label{fig:model_montage_clustering}
+\end{figure}
+
+
+
+
+
+Figure~\ref{fig:model_montage_clustering} shows the average value of Clustering Delay of mProjectPP, mDiffFit, and mBackground. It is clear that with the increase of $clusters.num$ (the maximum number of jobs per horizontal level), since there are less and less tasks in a clustered job, the Clustering Delay for each job decreases. For simplicity, we use an inverse proportional model in Equation~\ref{eq:model_clustering_delay} to describe this trend of Clustering Delay with $clusters.num$. Intuitively we assume that the average delay per task in a clustered job is constant ($n$ is the number of tasks in a horizontal level). An inverse proportional model can estimate the delay when $clusters.num=i$ directly if we have known the delay when $clusters.num=j$. Therefore we can predict all the clustering cases as long as we have gathered one clustering case. This feature will be used to evaluate the performance of a workflow simulator in Section \ref{sec:experiments}. 
+
+\begin{equation} \label{eq:model_clustering_delay}
+\frac{Clustering Delay|_{clusters.num=i}}{Clustering Delay|_{clusters.num=j}}=\frac{n/i}{n/j}=\frac{j}{i}
+\end{equation}
+
+
+
+
+\section{Scientific Workflow Applications}
+\label{sec:applications}
+
+Five widely used scientific workflow applications are used in this thesis: LIGO Inspiral analysis~\cite{LIGO}, Montage~\cite{Berriman2004}, CyberShake~\cite{Graves2010}, Epigenomics~\cite{Epigenome}, and SIPHT~\cite{SIPHT}. In this section, we describe each workflow application and present their main characteristics and structures. For simplicity, system overheads are not displayed.
+
+\paragraph{\textbf{LIGO}}
+\begin{figure*}[!htb]
+	\centering
+	\includegraphics[width=0.45\linewidth]{figures/workflowsim/ligo_shape.pdf} \\
+	\caption{A simplified visualization of the LIGO Inspiral workflow.}
+	\label{fig:model_shape_ligo}
+\end{figure*}
+Laser Interferometer Gravitational Wave Observatory (LIGO)~\cite{LIGO} workflows are used to search for gravitational wave signatures in data collected by large-scale interferometers. The observatories' mission is to detect and measure gravitational waves predicted by general relativity (Einstein's theory of gravity), in which gravity is described as due to the curvature of the fabric of time and space. The LIGO Inspiral workflow is a data-intensive workflow. Figure~\ref{fig:model_shape_ligo} shows a simplified version of this workflow. The LIGO Inspiral workflow is separated into multiple groups of interconnected tasks, which we call branches in this thesis. However, each branch may have a different number of pipelines as shown in Figure~\ref{fig:model_shape_ligo}. 
+
+\begin{figure*}[htb]
+	\centering
+	\includegraphics[width=0.4\linewidth]{figures/workflowsim/montage_shape.pdf} \\
+	\caption{A simplified visualization of the Montage workflow.}
+	\label{fig:model_shape_montage}
+\end{figure*}
+
+\paragraph{\textbf{Montage}}
+Montage~\cite{Berriman2004} is an astronomy application that is used to construct large image mosaics of the sky. Input images are reprojected onto a sphere and overlap is calculated for each input image. The application reprojects input images to the correct orientation while keeping background emission level constant in all images. The images are added by rectifying them to a common flux scale and background level. Finally the reprojected images are co-added into a final mosaic. The resulting mosaic image can provide a much deeper and detailed understanding of the portion of the sky in question. Figure~\ref{fig:model_shape_montage} illustrates a small Montage workflow. The size of the workflow depends on the number of images used in constructing the desired mosaic of the sky. 
+
+\begin{figure*}[htb]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/workflowsim/cybershake_shape.pdf} \\
+	\caption{A simplified visualization of the CyberShake workflow.}
+	\label{fig:model_shape_cybershake}
+\end{figure*}
+
+\paragraph{\textbf{Cybershake}}
+CyberShake~\cite{Graves2010} is a seismology application that calculates Probabilistic Seismic Hazard curves for geographic sites in the Southern California region. It identifies all ruptures within 200km of the site of interest and converts rupture definition into multiple rupture variations with differing hypocenter locations and slip distributions. It then calculates synthetic seismograms for each rupture variance, and peak intensity measures are then extracted from these synthetics and combined with the original rupture probabilities to produce probabilistic seismic hazard curves for the site. Figure~\ref{fig:model_shape_cybershake} shows an illustration of the Cybershake workflow.
+
+\begin{figure*}[htb]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/workflowsim/genome_shape.pdf} \\
+	\caption{A simplified visualization of the Epigenomics workflow with multiple branches.}
+	\label{fig:model_shape_genome}
+\end{figure*}
+
+\paragraph{\textbf{Epigenomics}}
+The Epigenomics workflow~\cite{Epigenome} is a CPU-intensive application. Initial data are acquired from the Illumina-Solexa Genetic Analyzer in the form of DNA sequence lanes. Each Solexa machine can generate multiple lanes of DNA sequences. Then the workflow maps DNA sequences to the correct locations in a reference Genome. This generates a map that displays the sequence density showing how many times a certain sequence expresses itself on a particular location on the reference genome. A simplified structure of Epigenomics is shown in Figure~\ref{fig:model_shape_genome}. 
+%Different to the LIGO Inspiral workflow, each branch in Epigenomics has exactly the same number of pipelines, which makes it more symmetric. 
+
+\begin{figure*}[htb]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/workflowsim/sipht_shape.pdf} \\
+	\caption{A simplified visualization of the SIPHT workflow.}
+	\label{fig:model_shape_sipht}
+\end{figure*}
+
+\paragraph{\textbf{SIPHT}}
+The SIPHT workflow~\cite{SIPHT} conducts a wide search for small untranslated RNAs (sRNAs) that regulates several processes such as secretion or virulence in bacteria. The kingdom-wide prediction and annotation of sRNA encoding genes involves a variety of individual programs that are executed in the proper order using Pegasus~\cite{Deelman2004}. These involve the prediction of $\rho$-independent transcriptional terminators, BLAST (Basic Local Alignment Search Tools~\cite{BLAST}) comparisons of the inter genetic regions of different replicons and the annotations of any sRNAs that are found. A simplified structure of the SIPHT workflow is shown in Figure~\ref{fig:model_shape_sipht}. 
+
+
+
+
+\begin{table}[!htb]
+	\setlength{\tabcolsep}{11pt}
+	\centering
+	\small
+	\begin{tabular}{lrrrr}
+		\hline
+		 & \multicolumn{1}{c}{Number} & \multicolumn{1}{c}{Average} &  \multicolumn{1}{c}{Average} \\
+		Workflow	& of Tasks	 & Data Size & Task Runtime \\
+		\hline
+		LIGO 		&800		& 5 MB	& 228s\\
+		Montage 		&300		&3 MB	&11s\\
+		CyberShake 	&700		&148 MB 	& 23s\\
+		Epigenomics 	&165 	& 355 MB	& 2952s\\
+		SIPHT		&1000	& 360 KB 	& 180s\\
+		\hline
+	\end{tabular}
+	\caption{Summary of the scientific workflows characteristics.}
+	\label{tab:model_workflows}
+\end{table} 
+
+Table~\ref{tab:model_workflows} shows the summary of the main \textbf{workflow characteristics}: number of tasks, average data size, and average task runtimes for the five workflows. 
+
+\section{Summary}
+In this chapter, we have introduced the background knowledge and our observed data about a wide range of scientific workflows, including a widely used workflow DAG model and the system model. In the next chapter, we are going to introduce the overhead-aware workflow model that provides better abstraction of scientific workflows executing in distributed environments. 
+
