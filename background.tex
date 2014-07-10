@@ -6,20 +6,16 @@ In this chapter, we introduce the background knowledge and  our observed data ab
 
 
 \begin{figure}[h!]
-\includegraphics[width=0.3\linewidth]{figures/model/dag.pdf}
+\includegraphics[width=0.3\linewidth]{figures/model/dag_file.pdf}
 \centering
-  \captionof{figure}{A simple DAG with four tasks ($t_1, t_2, t_3, t_4$). The edges represent data dependencies between tasks. }
+  \captionof{figure}{A simple DAG with four tasks ($t_1, t_2, t_3, t_4$). The edges represent data dependencies between tasks. $f_1, f_2, f_3, f_4, f_5, f_6$ represent files between tasks. In the rest of this thesis, files are not plotted in a DAG for better visualization. }
   \label{fig:intro_dag}
 \end{figure}
 
 %rewrite
-A workflow is usually modeled as a Directed Acyclic Graph (DAG). As shown in Figure~\ref{fig:intro_dag}, each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. 
+A workflow can be modeled as a Directed Acyclic Graph (DAG). As shown in Figure~\ref{fig:intro_dag}, each node in the DAG represents a workflow task, and the edges represent dependencies between the tasks ($t$) that constrain the order in which the tasks are executed. Each task is a program and a set of parameters that need to be executed. The dependencies typically represent data flow dependencies in the application, where the output files produced by one task are needed as inputs of another task. Other workflow models such as Petri Nets~\cite{alt2006grid} and SCUFL \cite{Oinn2004} are introduced in Section~\ref{sect:workflow_model}. 
 
-Scientific workflows increasingly require tremendous amounts of data processing and workflows with up to a million tasks are not uncommon \cite{Callaghan2011}. For example, the CyberShake workflow \cite{Rynge2012} composed of more than 800,000 jobs have been executed on the TeraGrid \cite{TeraGrid}. Among these large-scale, loosely-coupled applications, the majority of the tasks within these applications are often relatively small (from a few seconds to a few minutes in runtime). However, in aggregate they represent a significant amount of computation and data \cite{Deelman2002}. Most existing systems consider the allocation of computation resources and the scheduling of tasks, but do not effectively take into account system overheads, failure occurrence, or the possibility to restructure the workflow.
-An \textbf{overhead} is defined as the time of performing miscellaneous work other than executing the user's computational activities. Overheads adversely influence runtime of large-scale scientific workflows and cause significant resource underutilization \cite{Chen2011}. 
-
-In order to minimize the impact of system overheads, workflow restructuring techniques such as task clustering \cite{Singh2008,Hussin2010,Zhao2009} and workflow partitioning \cite{Kumar2002, Hedayat2009} have been developed to reduce the system overheads and improve their scalability. \textbf{Task clustering}~\cite{Singh2008} is a technique that merges small tasks into larger jobs so that the number of computational activities is reduced and the ratio of application computation to the system overheads is increased. A \textbf{job} is a single execution unit in a workflow management system such as Pegasus \cite{Deelman2004}, Askalon \cite{Ostermann2009b} and Taverna \cite{Calasanz2008}. 
-Figure~\ref{fig:intro_system} shows a typical execution environment for scientific workflows. The components of this environment are listed below: 
+A workflow is submitted to a workflow management system for execution that resides on a user-facing machine called the submit hosts. The target execution environment can be a local machine, like the submit host, a remote physical cluster or grid~\cite{fahringer2007askalon}, a dedicated parallel system~\cite{Rynge2012} or a virtual system such as the cloud~\cite{Berriman2010}. Figure~\ref{fig:intro_system} shows a typical execution environment for scientific workflows. The components of this environment are listed below: 
 
 \begin{figure}[h!]
 \centering
@@ -27,16 +23,19 @@ Figure~\ref{fig:intro_system} shows a typical execution environment for scientif
   \caption{System Model}
   \label{fig:intro_system}
 \end{figure}
-\textbf{Workflow Mapper} generates an executable workflow based on an abstract workflow provided by a user or a workflow composition system. 
-\textbf{Workflow Engine} executes the jobs defined by the workflow in order of their dependencies. Only free jobs that have all their parent jobs completed are submitted to  Job Scheduler. 
-\textbf{Job Scheduler} and \textbf{Local Queue} manage individual workflow jobs and supervise their execution on local and remote resources.
+\textbf{Workflow Mapper} generates an executable workflow based on an abstract workflow provided by a user or a workflow composition system. It finds the appropriate software, data, and computa- tional resources required for workflow execution. The Workflow Mapper can also restructure the workflow to optimize performance and ￼￼￼adds transformations for data management and provenance information generation.
+\textbf{Workflow Engine} executes the jobs defined by the workflow in order of their dependencies. It manages the jobs by tracking their statuses and determining when jobs are ready to run. Only free jobs that have all their parent jobs completed are submitted to the Job Scheduler. 
+\textbf{Job Scheduler} and \textbf{Local Queue} manage individual workflow jobs and supervise their execution on local and remote resources. Different scheduling algorithms such as HEFT\cite{Topcuoglu2002} and MinMin\cite{Blythe2005} can be applied to the Job Scheduler and improve the overall runtime of workflow executions. 
 \textbf{Job Wrapper} extracts tasks from clustered jobs and executes them at the worker nodes. 
 
 %Task clustering has been widely used in executing such large-scale scientific workflows and has demonstrated its great effort \cite{Singh2008}. 
-
+All of these components work cooperatively with each other to perform workflow preparation and execution. However, system overheads exist prevalently between and within these components. In next section, we will introduce the details about these system overheads. 
 
 \section{System Overheads}
 \label{sec:overheads}
+
+Overheads may adversely influence runtime of large-scale scientific workflows and cause significant resource underutilization \cite{Chen2011}. In this section, we introduce the classification and distributions of system overheads in a workflow management system as introduced above. 
+
 \subsection{Overhead Classification}
 
 

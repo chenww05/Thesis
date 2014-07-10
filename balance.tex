@@ -658,6 +658,21 @@ Similarly to the LIGO workflow, the performance gain $\mu$ values for the Epigen
 
 In a word, these experiments show strong connections between the imbalance metrics and the performance improvement of the balancing methods we proposed. HRV indicates the potential performance improvement for HRB. The higher HRV is, the more performance improvement HRB is likely to have. Similarly, for symmetric workflows (such as Epigenomics), their HIFV and HDV values are low and thus neither HIFB or HDB performs well. 
 
+\subsection{Compilation of the results}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.8\linewidth]{figures/balance/tree.pdf}
+	\captionof{figure}{Decision tree for selection of the appropriate balancing method.}
+	\label{fig:decision_tree}
+\end{figure}
+
+
+The experimental results show strong relations between the proposed imbalance metrics and the performance improvement of the balancing methods. HRV indicates the potential performance improvement for HRB. The higher HRV, the more performance improvement HRB is likely to have. Similarly, for workflows with symmetric structures (such as Epigenomics) where HIFV and HDV values are low, neither HIFB nor HDB performs well.
+
+Based on the conclusions of the experimental evaluation, we applied machine learning techniques on the result data to build a decision tree that can be used to drive the development of police engines to interactively select a balancing method. Although our decision tree is tightly coupled to our results, it can be used by online systems that implement the MAPE-K loop~\cite{FerreiradaSilva-FGCS-2013}, which will adjust the tree according to the system behavior.
+
+
 
 
 
