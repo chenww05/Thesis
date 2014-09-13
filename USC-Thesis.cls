@@ -177,12 +177,13 @@
       \vskip 0.25 true in%
       {\@month \ \@year \par}%   should be just month and year
     \end{center}%
-    \par
-    %\vfill
-    \vskip 0.61 true in
     \begin{center}%
       {\normalsize\ Copyright~ \@year\ \hfill ~\@author}%
     \end{center}%
+    \par
+    %\vfill
+    \vskip 0.61 true in
+    
  \end{titlepage}
    \pagenumbering{roman}
    \addtocounter{page}{1}
